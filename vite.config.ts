@@ -13,6 +13,7 @@ export default defineConfig({
     server: { entry: "server" },
   },
   nitro: {
-    preset: "node-server",
+    // Generate Vercel's native serverless output instead of a standalone Node server.
+    preset: "vercel",
   },
 });
