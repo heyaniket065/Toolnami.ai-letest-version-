@@ -1,6 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, LayoutGrid, Search, SearchX, X, Zap } from "lucide-react";
+import {
+  ArrowUpDown,
+  ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  LayoutGrid,
+  List,
+  Search,
+  SearchX,
+  X,
+  Zap,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { CategoryIcon, ToolCard, ToolCardSkeleton } from "@/components/site/tool-card";
@@ -8,11 +20,14 @@ import { Reveal } from "@/components/site/reveal";
 import { LiveToolCard } from "@/components/tools/live-tool-card";
 import { matchLiveTools } from "@/lib/phase1-tools";
 import {
+  CATEGORY_TOOL_COUNTS,
   TOOLS_PER_PAGE,
   categoriesQuery,
   toolsPageQuery,
   type ToolCategory,
+  type ToolSortOption,
 } from "@/lib/tools-data";
+import { useRecentAndSavedTools } from "@/hooks/use-recent-tools";
 
 type ToolsSearch = { q?: string | undefined; category?: string | undefined; page: number };
 
@@ -25,11 +40,11 @@ export const Route = createFileRoute("/tools/")({
   }),
   head: () => ({
     meta: [
-      { title: "All Online Tools Directory — ToolNami" },
+      { title: "All 96 Online Tools Directory — ToolNami" },
       {
         name: "description",
         content:
-          "Browse the full ToolNami directory: PDF, image, text, SEO, developer and conversion tools. Search by name or filter by category.",
+          "Browse the full ToolNami directory of 96+ free online tools: PDF, image, text, SEO, calculators, AI, and developer utilities.",
       },
       {
         name: "robots",
@@ -38,19 +53,19 @@ export const Route = createFileRoute("/tools/")({
       { property: "og:site_name", content: "ToolNami" },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://toolnami.com/tools" },
-      { property: "og:title", content: "All Online Tools Directory — ToolNami" },
+      { property: "og:title", content: "All 96 Online Tools Directory — ToolNami" },
       {
         property: "og:description",
-        content: "Search and filter hundreds of free online tools in one clean directory.",
+        content: "Search and filter 96+ free online tools in one clean directory.",
       },
       { property: "og:image", content: "/assets/tools/3d-pdf-compressor.png" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Instgram136" },
       { name: "twitter:creator", content: "@Instgram136" },
-      { name: "twitter:title", content: "All Online Tools Directory — ToolNami" },
+      { name: "twitter:title", content: "All 96 Online Tools Directory — ToolNami" },
       {
         name: "twitter:description",
-        content: "Search and filter hundreds of free online tools in one clean directory.",
+        content: "Search and filter 96+ free online tools in one clean directory.",
       },
       { name: "twitter:image", content: "/assets/tools/3d-pdf-compressor.png" },
     ],
@@ -63,6 +78,11 @@ function ToolsPage() {
   const { q, category, page } = Route.useSearch();
   const navigate = useNavigate({ from: "/tools" });
   const [term, setTerm] = useState(q ?? "");
+  const [sortBy, setSortBy] = useState<ToolSortOption>("featured");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [onlySaved, setOnlySaved] = useState(false);
+
+  const { savedSlugs, isToolSaved, toggleToolSaved } = useRecentAndSavedTools();
 
   useEffect(() => {
     setTerm(q ?? "");
@@ -76,11 +96,13 @@ function ToolsPage() {
       search: q ?? "",
       categoryId: activeCategory?.id ?? null,
       page,
+      sort: sortBy,
+      onlySlugs: onlySaved ? savedSlugs : null,
     }),
   );
 
   const liveTools = matchLiveTools(q ?? "");
-  const showLive = !category && page === 1 && liveTools.length > 0;
+  const showLive = !category && !onlySaved && page === 1 && liveTools.length > 0;
 
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / TOOLS_PER_PAGE));
@@ -98,13 +120,15 @@ function ToolsPage() {
         <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-primary">
-              <LayoutGrid className="size-3.5" /> Tool directory
+              <LayoutGrid className="size-3.5" /> Complete Tool Directory (
+              {CATEGORY_TOOL_COUNTS.all} Tools)
             </span>
             <h1 className="mt-5 text-3xl font-bold sm:text-5xl">
               Every ToolNami tool in one place
             </h1>
             <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Search by name, or narrow things down by category. New tools land here every week.
+              Search by keyword, filter by category, sort by popularity, or switch between 3D Grid
+              and Compact List views.
             </p>
           </Reveal>
 
@@ -126,7 +150,7 @@ function ToolsPage() {
                 id="directory-search-input"
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
-                placeholder="Search tools…"
+                placeholder="Search 96+ tools by name, format, or keyword…"
                 className="h-11 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground sm:text-base"
               />
               {term ? (
@@ -160,11 +184,11 @@ function ToolsPage() {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-[11px] font-semibold text-accent-foreground">
-                  <Zap className="size-3" /> Ready to use
+                  <Zap className="size-3" /> Flagship Studio
                 </span>
-                <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Live ToolNami tools</h2>
+                <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Featured Live Tools</h2>
                 <p className="mt-2 max-w-md text-sm text-muted-foreground sm:text-base">
-                  Built-in tools that run instantly in your browser.
+                  High-demand utilities that run 100% locally in your browser.
                 </p>
               </div>
             </div>
@@ -180,44 +204,123 @@ function ToolsPage() {
       ) : null}
 
       <section className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+        {/* Category & Saved Filter Bar */}
         <div role="group" aria-label="Filter tools by category" className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setSearch({ category: undefined })}
-            aria-pressed={!category}
-            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
-              !category
+            onClick={() => {
+              setOnlySaved(false);
+              setSearch({ category: undefined });
+            }}
+            aria-pressed={!category && !onlySaved}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
+              !category && !onlySaved
                 ? "border-primary bg-primary text-primary-foreground shadow-soft"
                 : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-primary"
             }`}
           >
-            All tools
+            <span>All tools</span>
+            <span className="text-xs opacity-75">({CATEGORY_TOOL_COUNTS.all})</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setOnlySaved((prev) => !prev);
+              setSearch({ page: 1 });
+            }}
+            aria-pressed={onlySaved}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
+              onlySaved
+                ? "border-rose-500 bg-rose-500 text-white shadow-soft"
+                : "border-border bg-card text-muted-foreground hover:border-rose-500/40 hover:text-rose-500"
+            }`}
+          >
+            <Heart className={`size-3.5 ${onlySaved ? "fill-white" : ""}`} />
+            <span>Saved</span>
+            <span className="text-xs opacity-80">({savedSlugs.length})</span>
+          </button>
+
           {categories.map((c: ToolCategory) => (
             <button
               key={c.id}
               type="button"
-              onClick={() => setSearch({ category: c.slug })}
-              aria-pressed={category === c.slug}
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
-                category === c.slug
+              onClick={() => {
+                setOnlySaved(false);
+                setSearch({ category: c.slug });
+              }}
+              aria-pressed={category === c.slug && !onlySaved}
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
+                category === c.slug && !onlySaved
                   ? "border-primary bg-primary text-primary-foreground shadow-soft"
                   : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-primary"
               }`}
             >
               <CategoryIcon name={c.icon} className="size-4" />
-              {c.name}
+              <span>{c.name}</span>
+              <span className="text-xs opacity-75">({CATEGORY_TOOL_COUNTS[c.id] || 0})</span>
             </button>
           ))}
         </div>
 
-        <p className="mt-6 text-sm text-muted-foreground" aria-live="polite">
-          {isPending
-            ? "Loading tools…"
-            : `${total} tool${total === 1 ? "" : "s"}${q ? ` for “${q}”` : ""}${
-                activeCategory ? ` in ${activeCategory.name}` : ""
-              }`}
-        </p>
+        {/* Status Bar + Sort & View Mode Controls */}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-4">
+          <p className="text-sm text-muted-foreground" aria-live="polite">
+            {isPending
+              ? "Loading tools…"
+              : `Showing ${total} tool${total === 1 ? "" : "s"}${q ? ` for “${q}”` : ""}${
+                  activeCategory ? ` in ${activeCategory.name}` : ""
+                }${onlySaved ? " in Saved Bookmarks" : ""}`}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Sort Select */}
+            <div className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground">
+              <ArrowUpDown className="size-3.5 text-primary" />
+              <span>Sort:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as ToolSortOption)}
+                aria-label="Sort tools"
+                className="bg-transparent font-semibold text-foreground outline-none cursor-pointer"
+              >
+                <option value="featured">Featured First</option>
+                <option value="popular">Most Popular</option>
+                <option value="az">Alphabetical (A–Z)</option>
+              </select>
+            </div>
+
+            {/* Grid vs Compact List Toggle */}
+            <div
+              role="group"
+              aria-label="Toggle directory view mode"
+              className="inline-flex items-center rounded-xl border border-border bg-card p-1"
+            >
+              <button
+                type="button"
+                onClick={() => setViewMode("grid")}
+                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
+                  viewMode === "grid"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <LayoutGrid className="size-3.5" /> Grid
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("list")}
+                className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
+                  viewMode === "list"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <List className="size-3.5" /> List
+              </button>
+            </div>
+          </div>
+        </div>
 
         {isError ? (
           <div className="mt-10 rounded-2xl border border-destructive/30 bg-destructive/5 p-10 text-center">
@@ -237,14 +340,19 @@ function ToolsPage() {
             <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary-soft text-primary">
               <SearchX className="size-6" />
             </span>
-            <h2 className="mt-5 text-lg font-semibold">No tools matched your search</h2>
+            <h2 className="mt-5 text-lg font-semibold">
+              {onlySaved ? "No saved bookmarks yet" : "No tools matched your search"}
+            </h2>
             <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-              Try a different keyword or clear the filters to browse the full directory.
+              {onlySaved
+                ? "Click the heart icon on any tool card to bookmark your favorite utilities for instant access."
+                : "Try a different keyword or clear the filters to browse the full directory."}
             </p>
             <button
               type="button"
               onClick={() => {
                 setTerm("");
+                setOnlySaved(false);
                 navigate({ search: { page: 1 } });
               }}
               className="mt-6 inline-flex rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:brightness-110 active:scale-95"
@@ -252,7 +360,7 @@ function ToolsPage() {
               Reset filters
             </button>
           </div>
-        ) : (
+        ) : viewMode === "grid" ? (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {data.tools.map((tool, i) => (
               <Reveal key={tool.id} delay={Math.min(i * 60, 240)} className="h-full">
@@ -262,6 +370,67 @@ function ToolsPage() {
                 />
               </Reveal>
             ))}
+          </div>
+        ) : (
+          <div className="mt-6 space-y-3">
+            {data.tools.map((tool) => {
+              const cat = categories.find((c: ToolCategory) => c.id === tool.category_id);
+              const saved = isToolSaved(tool.slug);
+              return (
+                <div
+                  key={`list-${tool.id}`}
+                  className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-border bg-card p-3.5 shadow-soft transition-all hover:border-primary/40 hover:shadow-lift"
+                >
+                  <Link
+                    to={`/tools/${tool.slug}`}
+                    className="flex items-center gap-4 min-w-0 flex-1"
+                  >
+                    <img
+                      src={tool.thumbnail_url || `/assets/tools/${tool.slug}.png`}
+                      alt={tool.title}
+                      className="h-16 w-24 shrink-0 rounded-xl object-cover border border-border/60"
+                      loading="lazy"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                          {tool.title}
+                        </h3>
+                        {cat && (
+                          <span className="text-xs font-medium text-muted-foreground">
+                            · {cat.name}
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">
+                        {tool.description}
+                      </p>
+                    </div>
+                  </Link>
+
+                  <div className="flex items-center justify-end gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => void toggleToolSaved(tool.slug, tool.title)}
+                      aria-label={saved ? "Remove from saved" : "Save tool"}
+                      className={`inline-flex size-9 items-center justify-center rounded-xl border transition-colors cursor-pointer ${
+                        saved
+                          ? "border-rose-500/40 bg-rose-500/15 text-rose-500"
+                          : "border-border bg-background text-muted-foreground hover:text-rose-500"
+                      }`}
+                    >
+                      <Heart className={`size-4 ${saved ? "fill-rose-500" : ""}`} />
+                    </button>
+                    <Link
+                      to={`/tools/${tool.slug}`}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-all hover:brightness-110"
+                    >
+                      Open Tool <ArrowUpRight className="size-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 

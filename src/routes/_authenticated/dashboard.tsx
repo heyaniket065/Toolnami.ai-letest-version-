@@ -12,13 +12,18 @@ import {
   UserRound,
   Wrench,
   ExternalLink,
+  Download,
+  Upload,
+  NotebookPen,
+  Copy,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Reveal } from "@/components/site/reveal";
 import { applyTheme } from "@/lib/theme";
 import { useAuth } from "@/hooks/use-auth";
+import { useRecentAndSavedTools } from "@/hooks/use-recent-tools";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -59,6 +64,10 @@ function DashboardPage() {
     updateThemePreference,
     signOut,
   } = useAuth();
+
+  const { scratchpad, updateScratchpad, exportWorkspaceData, importWorkspaceData } =
+    useRecentAndSavedTools();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [displayName, setDisplayName] = useState("");
   const [savingName, setSavingName] = useState(false);
@@ -331,6 +340,87 @@ function DashboardPage() {
                 ))}
               </ul>
             )}
+          </section>
+        </Reveal>
+      </div>
+
+      {/* Cross-Tool Scratchpad & Workspace Portability */}
+      <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <Reveal delay={200}>
+          <section className={card}>
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="flex items-center gap-2 text-lg font-semibold">
+                <NotebookPen className="size-[18px] text-primary" /> Cross-Tool Scratchpad
+              </h2>
+              {scratchpad ? (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(scratchpad);
+                    toast.success("Copied scratchpad notes!");
+                  }}
+                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1 text-xs font-semibold text-foreground hover:border-primary/40"
+                >
+                  <Copy className="size-3" /> Copy
+                </button>
+              ) : null}
+            </div>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Persistent clipboard notes accessible inside every tool studio across ToolNami.
+            </p>
+            <textarea
+              value={scratchpad}
+              onChange={(e) => updateScratchpad(e.target.value)}
+              rows={4}
+              placeholder="Save hex palettes, JSON snippets, calculated figures, or SEO tags here..."
+              className="mt-4 w-full rounded-2xl border border-input bg-background p-3.5 font-mono text-xs text-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-ring/20"
+            />
+          </section>
+        </Reveal>
+
+        <Reveal delay={240}>
+          <section className={card}>
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <Download className="size-[18px] text-primary" /> Workspace Backup &amp; Portability
+            </h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Export your saved bookmarks, recent tool history, and scratchpad notes as a portable
+              JSON file, or restore a previous backup.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={exportWorkspaceData}
+                className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:brightness-110 active:scale-95"
+              >
+                <Download className="size-4" /> Export Workspace JSON
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-5 text-sm font-semibold text-foreground transition-all hover:border-primary/40 hover:text-primary active:scale-95"
+              >
+                <Upload className="size-4" /> Restore Backup
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    if (typeof reader.result === "string") {
+                      importWorkspaceData(reader.result);
+                    }
+                  };
+                  reader.readAsText(file);
+                  e.target.value = "";
+                }}
+              />
+            </div>
           </section>
         </Reveal>
       </div>

@@ -138,7 +138,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-const themeScript = `(function(){try{var t=localStorage.getItem('toolnami-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}if(t==='dark'){document.documentElement.classList.add('dark');}document.documentElement.style.colorScheme=t;}catch(e){}})();`;
+const themeScript = `(function(){try{var t=localStorage.getItem('toolnami-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}if(t==='dark'){document.documentElement.classList.add('dark');}document.documentElement.style.colorScheme=t;var handleImportErr=function(e){var msg=String((e&&(e.reason&&e.reason.message||e.message))||'');if(msg.indexOf('Failed to fetch dynamically imported module')!==-1||msg.indexOf('Importing a module script failed')!==-1){if(e.preventDefault)e.preventDefault();var k='tn_mod_retry';var last=Number(sessionStorage.getItem(k)||'0');if(Date.now()-last>5000){sessionStorage.setItem(k,String(Date.now()));window.location.reload();}}};window.addEventListener('unhandledrejection',handleImportErr,true);window.addEventListener('error',handleImportErr,true);}catch(e){}})();`;
 
 const schemaOrgJsonLd = JSON.stringify({
   "@context": "https://schema.org",

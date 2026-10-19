@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Eye, Sparkles } from "lucide-react";
+import { ArrowUpRight, Eye, Heart, Sparkles } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useState } from "react";
 
 import type { Tool, ToolCategory } from "@/lib/tools-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToolUsage } from "@/hooks/use-tool-usage";
+import { useRecentAndSavedTools } from "@/hooks/use-recent-tools";
 import { getToolBySlug } from "@/lib/complete-tools";
 
 function CategoryIcon({
@@ -29,6 +30,7 @@ export function ToolCard({ tool, category }: { tool: Tool; category?: ToolCatego
     `/assets/tools/${tool.slug}.png`;
 
   const [imgSrc, setImgSrc] = useState<string>(initialImage);
+  const { isToolSaved, toggleToolSaved } = useRecentAndSavedTools();
 
   const { formatted: usageCount, hasIncremented } = useToolUsage(
     completeTool?.baseUses || tool.views || 18000,
@@ -39,62 +41,81 @@ export function ToolCard({ tool, category }: { tool: Tool; category?: ToolCatego
   );
 
   const targetSlug = completeTool?.slug || tool.slug;
+  const saved = isToolSaved(targetSlug);
 
   return (
-    <Link
-      to={`/tools/${targetSlug}`}
-      aria-label={tool.title}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lift focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-    >
-      <div className="relative aspect-[16/10] overflow-hidden bg-muted/30">
-        <img
-          src={imgSrc}
-          alt={tool.title}
-          onError={() => {
-            if (imgSrc !== "/assets/tools/3d-image-compressor.png") {
-              setImgSrc("/assets/tools/3d-image-compressor.png");
-            }
-          }}
-          className="w-full h-full object-cover block transition-transform duration-300 group-hover:scale-105"
-          referrerPolicy="no-referrer"
-          loading="lazy"
-        />
-        {tool.featured ? (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-[11px] font-semibold text-accent-foreground shadow-sm">
-            <Sparkles className="size-3" /> Featured
-          </span>
-        ) : null}
-        <span className="absolute top-3 right-3 inline-flex size-8 items-center justify-center rounded-full bg-card/85 text-primary opacity-0 transition-all duration-300 group-hover:opacity-100 shadow-sm">
-          <ArrowUpRight className="size-4" />
-        </span>
-      </div>
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lift">
+      {/* 1-Click Bookmark Button */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void toggleToolSaved(targetSlug, tool.title);
+        }}
+        aria-label={saved ? `Remove ${tool.title} from saved tools` : `Save ${tool.title}`}
+        title={saved ? "Saved in bookmarks" : "Save tool for quick access"}
+        className={`absolute top-3 right-3 z-20 inline-flex size-8 items-center justify-center rounded-full border shadow-sm transition-all duration-200 active:scale-90 cursor-pointer ${
+          saved
+            ? "border-rose-500/40 bg-rose-500 text-white"
+            : "border-border/60 bg-card/90 text-muted-foreground hover:text-rose-500 hover:bg-card"
+        }`}
+      >
+        <Heart className={`size-4 ${saved ? "fill-white" : ""}`} />
+      </button>
 
-      <div className="flex flex-1 flex-col gap-2 p-4 sm:p-5">
-        {category ? (
-          <span className="text-[11px] font-semibold tracking-wide text-primary uppercase">
-            {category.name}
-          </span>
-        ) : null}
-        <h3 className="text-base font-semibold text-card-foreground sm:text-lg group-hover:text-primary transition-colors">
-          {tool.title}
-        </h3>
-        <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
-        <div className="mt-auto flex items-center justify-between pt-3 text-xs text-muted-foreground border-t border-border/40">
-          <span
-            suppressHydrationWarning
-            className={`flex items-center gap-1.5 transition-all duration-300 ${
-              hasIncremented ? "text-emerald-400 font-semibold" : ""
-            }`}
-          >
-            <Eye className="size-3.5" />
-            <span suppressHydrationWarning>{usageCount}</span>
-          </span>
-          <span className="text-primary font-semibold text-[11px] group-hover:underline">
-            Use tool →
-          </span>
+      <Link
+        to={`/tools/${targetSlug}`}
+        aria-label={tool.title}
+        className="flex flex-1 flex-col focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+      >
+        <div className="relative aspect-[16/10] overflow-hidden bg-muted/30">
+          <img
+            src={imgSrc}
+            alt={tool.title}
+            onError={() => {
+              if (imgSrc !== "/assets/tools/3d-image-compressor.png") {
+                setImgSrc("/assets/tools/3d-image-compressor.png");
+              }
+            }}
+            className="w-full h-full object-cover block transition-transform duration-300 group-hover:scale-105"
+            referrerPolicy="no-referrer"
+            loading="lazy"
+          />
+          {tool.featured ? (
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-[11px] font-semibold text-accent-foreground shadow-sm">
+              <Sparkles className="size-3" /> Featured
+            </span>
+          ) : null}
         </div>
-      </div>
-    </Link>
+
+        <div className="flex flex-1 flex-col gap-2 p-4 sm:p-5">
+          {category ? (
+            <span className="text-[11px] font-semibold tracking-wide text-primary uppercase">
+              {category.name}
+            </span>
+          ) : null}
+          <h3 className="text-base font-semibold text-card-foreground sm:text-lg group-hover:text-primary transition-colors">
+            {tool.title}
+          </h3>
+          <p className="line-clamp-2 text-sm text-muted-foreground">{tool.description}</p>
+          <div className="mt-auto flex items-center justify-between pt-3 text-xs text-muted-foreground border-t border-border/40">
+            <span
+              suppressHydrationWarning
+              className={`flex items-center gap-1.5 transition-all duration-300 ${
+                hasIncremented ? "text-emerald-400 font-semibold" : ""
+              }`}
+            >
+              <Eye className="size-3.5" />
+              <span suppressHydrationWarning>{usageCount}</span>
+            </span>
+            <span className="inline-flex items-center gap-1 text-primary font-semibold text-[11px] group-hover:underline">
+              Use tool <ArrowUpRight className="size-3.5" />
+            </span>
+          </div>
+        </div>
+      </Link>
+    </div>
   );
 }
 

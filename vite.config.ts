@@ -15,4 +15,33 @@ export default defineConfig({
   nitro: {
     preset: "node-server",
   },
+  vite: {
+    optimizeDeps: {
+      entries: ["src/router.tsx", "src/routes/**/*.{ts,tsx}"],
+      include: [
+        "react",
+        "react-dom",
+        "react-dom/client",
+        "react/jsx-runtime",
+        "react/jsx-dev-runtime",
+        "@radix-ui/react-accordion",
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-dropdown-menu",
+        "@radix-ui/react-progress",
+        "@supabase/supabase-js",
+        "@tanstack/react-query",
+        "browser-image-compression",
+        "clsx",
+        "firebase/app",
+        "firebase/auth",
+        "firebase/firestore",
+        "lucide-react",
+        "pdf-lib",
+        "qrcode",
+        "sonner",
+        "tailwind-merge",
+        "zod",
+      ],
+    },
+  },
 });

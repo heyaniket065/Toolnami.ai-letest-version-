@@ -1,13 +1,34 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Gauge, Search, ShieldCheck, Sparkles, Wallet } from "lucide-react";
-import { useState } from "react";
+import {
+  ArrowRight,
+  Clock,
+  Gauge,
+  Heart,
+  Search,
+  ShieldCheck,
+  Shuffle,
+  Sparkles,
+  Trash2,
+  Wallet,
+  Workflow,
+  ChevronRight,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { Reveal } from "@/components/site/reveal";
 import { CategoryIcon, ToolCard, ToolCardSkeleton } from "@/components/site/tool-card";
 import { LiveToolCard } from "@/components/tools/live-tool-card";
 import { LIVE_TOOLS } from "@/lib/phase1-tools";
-import { categoriesQuery, featuredToolsQuery, type ToolCategory } from "@/lib/tools-data";
+import { COMPLETE_TOOLS, getToolBySlug, type CompleteTool } from "@/lib/complete-tools";
+import {
+  ALL_CATALOGUE_TOOLS,
+  CATEGORY_TOOL_COUNTS,
+  categoriesQuery,
+  featuredToolsQuery,
+  type ToolCategory,
+} from "@/lib/tools-data";
+import { useRecentAndSavedTools, WORKFLOW_PIPELINES } from "@/hooks/use-recent-tools";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,7 +37,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "ToolNami is a clean, fast platform of free online tools: merge PDFs, compress images, convert units, format code, and more — no installs, no clutter.",
+          "ToolNami is a clean, fast platform of 96+ free online tools: merge PDFs, compress images, convert units, format code, and more — no installs, no clutter.",
       },
       {
         name: "robots",
@@ -66,17 +87,53 @@ const TRUST = [
   },
 ];
 
+const QUICK_LAUNCH_PILLS = [
+  { label: "PDF Unlock", slug: "pdf-unlock" },
+  { label: "Word to PDF", slug: "word-to-pdf" },
+  { label: "Image Upscaler", slug: "image-upscaler" },
+  { label: "Pomodoro Timer", slug: "pomodoro-timer" },
+  { label: "JWT Decoder", slug: "jwt-decoder" },
+  { label: "Salary Calculator", slug: "salary-calculator" },
+];
+
 function Home() {
   const navigate = useNavigate();
   const [term, setTerm] = useState("");
+  const [activeShelf, setActiveShelf] = useState<string>("pdf");
 
   const { data: categories = [] } = useQuery(categoriesQuery);
   const { data: featured, isPending } = useQuery(featuredToolsQuery);
+  const { recentSlugs, savedSlugs, clearRecentTools } = useRecentAndSavedTools();
 
   const search = (e: React.FormEvent) => {
     e.preventDefault();
     navigate({ to: "/tools", search: { q: term.trim() || undefined, page: 1 } });
   };
+
+  const launchRandom = () => {
+    const random = COMPLETE_TOOLS[Math.floor(Math.random() * COMPLETE_TOOLS.length)];
+    if (random) {
+      navigate({ to: `/tools/${random.slug}` });
+    }
+  };
+
+  const recentTools = useMemo(() => {
+    return recentSlugs
+      .map((s) => getToolBySlug(s))
+      .filter((t): t is CompleteTool => Boolean(t))
+      .slice(0, 4);
+  }, [recentSlugs]);
+
+  const savedTools = useMemo(() => {
+    return savedSlugs
+      .map((s) => getToolBySlug(s))
+      .filter((t): t is CompleteTool => Boolean(t))
+      .slice(0, 4);
+  }, [savedSlugs]);
+
+  const shelfTools = useMemo(() => {
+    return ALL_CATALOGUE_TOOLS.filter((t) => t.category_id === activeShelf).slice(0, 6);
+  }, [activeShelf]);
 
   return (
     <div className="page-enter">
@@ -84,8 +141,9 @@ function Home() {
       <section className="surface-hero relative overflow-hidden border-b border-border">
         <div className="mx-auto w-full max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-24">
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-primary shadow-soft">
-              <Sparkles className="size-3.5 text-accent" /> A rising wave of useful tools
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-semibold text-primary shadow-soft">
+              <Sparkles className="size-3.5 text-accent" /> 96+ Professional Client-Side Tools •
+              100% Free
             </span>
           </Reveal>
 
@@ -98,8 +156,8 @@ function Home() {
 
           <Reveal delay={140}>
             <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              ToolNami collects the tools you keep googling — PDF, image, text, SEO and developer
-              utilities — into one fast, clean and free platform.
+              ToolNami collects the tools you keep googling — PDF, image, text, SEO, calculators,
+              and developer utilities — into one fast, clean, and private workspace.
             </p>
           </Reveal>
 
@@ -118,7 +176,7 @@ function Home() {
                 id="home-search-input"
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
-                placeholder="What do you need to do today?"
+                placeholder="Search 96+ tools (or press ⌘K anywhere)..."
                 className="h-11 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground sm:text-base"
               />
               <button
@@ -129,27 +187,131 @@ function Home() {
                 Search
               </button>
             </form>
+
+            {/* Quick-Launch Task Pills */}
+            <div className="mx-auto mt-4 flex max-w-2xl flex-wrap items-center justify-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">Try:</span>
+              {QUICK_LAUNCH_PILLS.map((item) => (
+                <Link
+                  key={item.slug}
+                  to={`/tools/${item.slug}`}
+                  className="rounded-lg border border-border/80 bg-card/80 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary-soft hover:text-primary"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </Reveal>
 
           <Reveal delay={260}>
-            <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 to="/tools"
                 search={{ page: 1 }}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-sm font-semibold text-accent-foreground shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-lift active:scale-95 sm:w-auto"
               >
-                Explore Tools <ArrowRight className="size-4" />
+                Explore All 96 Tools <ArrowRight className="size-4" />
               </Link>
-              <Link
-                to="/about"
-                className="inline-flex w-full items-center justify-center rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-semibold transition-all hover:border-primary/40 hover:text-primary active:scale-95 sm:w-auto"
+              <button
+                type="button"
+                onClick={launchRandom}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-semibold transition-all hover:border-primary/40 hover:text-primary active:scale-95 sm:w-auto cursor-pointer"
               >
-                Why ToolNami?
-              </Link>
+                <Shuffle className="size-4 text-primary" /> Surprise Me
+              </button>
             </div>
           </Reveal>
         </div>
       </section>
+
+      {/* Personal Quick-Access Hub (Saved Bookmarks & Recently Used) */}
+      {(savedTools.length > 0 || recentTools.length > 0) && (
+        <section className="border-b border-border bg-card/40">
+          <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+            <div className="grid gap-8 lg:grid-cols-2">
+              {savedTools.length > 0 && (
+                <div>
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-500">
+                      <Heart className="size-3.5 fill-rose-500" /> Your Saved Bookmarks
+                    </span>
+                    <Link
+                      to="/tools"
+                      search={{ page: 1 }}
+                      className="text-xs font-semibold text-primary hover:underline"
+                    >
+                      Manage all →
+                    </Link>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {savedTools.map((t) => (
+                      <Link
+                        key={`home-saved-${t.slug}`}
+                        to={`/tools/${t.slug}`}
+                        className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/40"
+                      >
+                        <img
+                          src={t.image}
+                          alt={t.title}
+                          className="h-12 w-18 shrink-0 rounded-xl object-cover border border-border/50"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm font-bold text-foreground group-hover:text-primary">
+                            {t.title}
+                          </div>
+                          <div className="truncate text-xs text-muted-foreground">
+                            {t.categoryLabel}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {recentTools.length > 0 && (
+                <div>
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      <Clock className="size-3.5 text-primary" /> Continue Where You Left Off
+                    </span>
+                    <button
+                      type="button"
+                      onClick={clearRecentTools}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-destructive cursor-pointer"
+                    >
+                      <Trash2 className="size-3" /> Clear
+                    </button>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {recentTools.map((t) => (
+                      <Link
+                        key={`home-recent-${t.slug}`}
+                        to={`/tools/${t.slug}`}
+                        className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/40"
+                      >
+                        <img
+                          src={t.image}
+                          alt={t.title}
+                          className="h-12 w-18 shrink-0 rounded-xl object-cover border border-border/50"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm font-bold text-foreground group-hover:text-primary">
+                            {t.title}
+                          </div>
+                          <div className="truncate text-xs text-muted-foreground">
+                            {t.categoryLabel}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Popular Tools — built-in ToolNami tools */}
       <section className="mx-auto w-full max-w-6xl px-4 pt-16 sm:px-6 sm:pt-20">
@@ -157,11 +319,11 @@ function Home() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-[11px] font-semibold text-accent-foreground">
-                <Sparkles className="size-3" /> Ready to use
+                <Sparkles className="size-3" /> Flagship Studio
               </span>
-              <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Popular Tools</h2>
+              <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Most Used Flagship Tools</h2>
               <p className="mt-2 max-w-md text-sm text-muted-foreground sm:text-base">
-                Our built-in tools run instantly in your browser — nothing to install, nothing
+                Our flagship utilities run instantly in your browser — nothing to install, nothing
                 uploaded.
               </p>
             </div>
@@ -177,14 +339,155 @@ function Home() {
         </div>
       </section>
 
+      {/* Smart Multi-Step Workflow Pipelines */}
+      <section className="mx-auto w-full max-w-6xl px-4 pt-16 sm:px-6 sm:pt-20">
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary-soft px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+                <Workflow className="size-3.5" /> Multi-Tool Chains
+              </span>
+              <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Smart Workflow Pipelines</h2>
+              <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
+                Chain multiple utilities together in a guided sequence — complete with a built-in
+                progress bar and cross-tool scratchpad.
+              </p>
+            </div>
+          </div>
+        </Reveal>
+
+        <div className="mt-8 grid gap-5 md:grid-cols-2">
+          {WORKFLOW_PIPELINES.map((pipeline, idx) => (
+            <Reveal key={pipeline.id} delay={idx * 60}>
+              <div
+                className={`flex h-full flex-col justify-between rounded-3xl border bg-gradient-to-br p-6 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift ${pipeline.accent}`}
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="rounded-full border border-border bg-background/90 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+                      {pipeline.badge}
+                    </span>
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {pipeline.steps.length}-Step Chain
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-lg font-bold text-foreground">{pipeline.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    {pipeline.description}
+                  </p>
+
+                  <div className="mt-5 flex flex-wrap items-center gap-1.5">
+                    {pipeline.steps.map((step, sIdx) => (
+                      <div key={step.slug} className="flex items-center gap-1.5">
+                        <Link
+                          to={`/tools/${step.slug}`}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card/90 px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:border-primary/50 hover:text-primary"
+                        >
+                          <span>{step.actionLabel}</span>
+                        </Link>
+                        {sIdx < pipeline.steps.length - 1 ? (
+                          <ChevronRight className="size-3.5 text-muted-foreground/60" />
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Starts with{" "}
+                    <strong className="text-foreground">{pipeline.steps[0].title}</strong>
+                  </span>
+                  <Link
+                    to={`/tools/${pipeline.steps[0].slug}`}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-primary-foreground shadow-soft transition-all hover:brightness-110"
+                  >
+                    <span>Launch Pipeline</span>
+                    <ArrowRight className="size-3.5" />
+                  </Link>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* Interactive Category Showcase Tabs */}
+      <section className="mx-auto w-full max-w-6xl px-4 pt-16 sm:px-6 sm:pt-20">
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold sm:text-3xl">Explore by Category</h2>
+              <p className="mt-2 max-w-lg text-sm text-muted-foreground sm:text-base">
+                Switch between specialized tool suites to preview our 3D studio utilities.
+              </p>
+            </div>
+            <Link
+              to="/tools"
+              search={{ category: activeShelf, page: 1 }}
+              className="group inline-flex items-center gap-2 text-sm font-semibold text-primary"
+            >
+              See all in category
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+
+          <div
+            role="tablist"
+            aria-label="Category preview tabs"
+            className="mt-6 flex flex-wrap gap-2"
+          >
+            {categories.map((c: ToolCategory) => {
+              const active = activeShelf === c.slug;
+              const count = CATEGORY_TOOL_COUNTS[c.id] || 0;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setActiveShelf(c.slug)}
+                  className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                    active
+                      ? "border-primary bg-primary text-primary-foreground shadow-soft"
+                      : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                  }`}
+                >
+                  <CategoryIcon name={c.icon} className="size-4" />
+                  <span>{c.name}</span>
+                  <span
+                    className={`text-[11px] ${
+                      active ? "text-primary-foreground/80" : "text-muted-foreground"
+                    }`}
+                  >
+                    ({count})
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </Reveal>
+
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {shelfTools.map((tool, i) => (
+            <Reveal key={tool.id} delay={Math.min(i * 60, 240)} className="h-full">
+              <ToolCard
+                tool={tool}
+                category={categories.find((c: ToolCategory) => c.id === tool.category_id)}
+              />
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
       {/* Featured tools */}
       <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold sm:text-3xl">Popular right now</h2>
+              <h2 className="text-2xl font-bold sm:text-3xl">Trending right now</h2>
               <p className="mt-2 max-w-md text-sm text-muted-foreground sm:text-base">
-                A handful of favourites to get you started.
+                Community favorites across PDF, image, and developer workflows.
               </p>
             </div>
             <Link
@@ -192,7 +495,7 @@ function Home() {
               search={{ page: 1 }}
               className="group inline-flex items-center gap-2 text-sm font-semibold text-primary"
             >
-              View all
+              View all 96 tools
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
@@ -212,13 +515,13 @@ function Home() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Categories Grid */}
       <section className="border-y border-border bg-card/50">
         <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
           <Reveal>
-            <h2 className="text-2xl font-bold sm:text-3xl">Browse by category</h2>
+            <h2 className="text-2xl font-bold sm:text-3xl">Browse all 8 tool suites</h2>
             <p className="mt-2 max-w-md text-sm text-muted-foreground sm:text-base">
-              Pick a shelf and see everything on it.
+              Pick a category shelf and see every specialized utility inside it.
             </p>
           </Reveal>
 
@@ -230,10 +533,17 @@ function Home() {
                   search={{ category: c.slug, page: 1 }}
                   className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lift"
                 >
-                  <span className="inline-flex size-11 items-center justify-center rounded-xl bg-primary-soft text-primary transition-transform duration-300 group-hover:scale-110">
-                    <CategoryIcon name={c.icon} className="size-5" />
-                  </span>
-                  <h3 className="mt-4 text-base font-semibold">{c.name}</h3>
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex size-11 items-center justify-center rounded-xl bg-primary-soft text-primary transition-transform duration-300 group-hover:scale-110">
+                      <CategoryIcon name={c.icon} className="size-5" />
+                    </span>
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {CATEGORY_TOOL_COUNTS[c.id] || 0} tools
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-base font-semibold group-hover:text-primary transition-colors">
+                    {c.name}
+                  </h3>
                   <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">
                     {c.description}
                   </p>
@@ -274,14 +584,14 @@ function Home() {
               The whole toolbox is one tap away
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-sm text-muted-foreground sm:text-base">
-              Search the full directory, filter by category, and find the exact tool you need.
+              Search the full directory of 96 tools, filter by category, or press ⌘K from anywhere.
             </p>
             <Link
               to="/tools"
               search={{ page: 1 }}
               className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-lift active:scale-95"
             >
-              Explore All Tools <ArrowRight className="size-4" />
+              Explore All 96 Tools <ArrowRight className="size-4" />
             </Link>
           </div>
         </Reveal>

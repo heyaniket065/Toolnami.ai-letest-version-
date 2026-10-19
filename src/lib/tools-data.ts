@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { COMPLETE_TOOLS, getToolBySlug } from "./complete-tools";
+import { COMPLETE_TOOLS } from "./complete-tools";
 
 export type ToolCategory = {
   id: string;
@@ -20,6 +20,8 @@ export type Tool = {
   views: number;
 };
 
+export type ToolSortOption = "popular" | "featured" | "az";
+
 export const TOOLS_PER_PAGE = 12;
 
 export const DEFAULT_CATEGORIES: ToolCategory[] = [
@@ -28,56 +30,56 @@ export const DEFAULT_CATEGORIES: ToolCategory[] = [
     name: "PDF Tools",
     slug: "pdf",
     icon: "FileText",
-    description: "Compress, merge, split, and convert PDF documents",
+    description: "Compress, merge, split, unlock, and convert PDF documents",
   },
   {
     id: "image",
     name: "Image Tools",
     slug: "image",
     icon: "Image",
-    description: "Compress, resize, convert, and edit images",
+    description: "Compress, resize, upscale, convert, and edit images",
   },
   {
     id: "text",
     name: "Text Tools",
     slug: "text",
     icon: "Type",
-    description: "Word counters, case converters, and text formatters",
+    description: "Word counters, diff checkers, case converters, and formatters",
   },
   {
     id: "developer",
     name: "Developer Tools",
     slug: "developer",
     icon: "Code",
-    description: "QR code, password, UUID, and code formatters",
+    description: "JSON, CSV, Markdown, JWT, Cron, UUID, and code formatters",
   },
   {
     id: "seo",
     name: "SEO Tools",
     slug: "seo",
     icon: "Search",
-    description: "Meta tags, sitemaps, and robots.txt generators",
+    description: "Meta tags, Open Graph, sitemaps, and robots.txt generators",
   },
   {
     id: "calculator",
     name: "Calculators",
     slug: "calculator",
     icon: "Calculator",
-    description: "Age, BMI, EMI, and percentage calculators",
+    description: "EMI, salary, compound interest, GST, BMI, and invoice tools",
   },
   {
     id: "utility",
     name: "Utility Tools",
     slug: "utility",
     icon: "Wrench",
-    description: "Unit, time, and currency converters",
+    description: "Pomodoro timer, stopwatch, speed test, unit, and currency tools",
   },
   {
     id: "ai",
     name: "AI Tools",
     slug: "ai",
     icon: "Sparkles",
-    description: "AI content, title, and caption generation",
+    description: "AI blog, content, headline, hashtag, and caption generation",
   },
 ];
 
@@ -88,9 +90,19 @@ export const ALL_CATALOGUE_TOOLS: Tool[] = COMPLETE_TOOLS.map((t, index) => ({
   description: t.summary,
   thumbnail_url: t.image,
   category_id: t.category,
-  featured: t.badge.tone === "featured" || index < 12,
+  featured: t.isFeatured || t.badge.tone === "featured" || index < 12,
   views: t.baseUses,
 }));
+
+export const CATEGORY_TOOL_COUNTS: Record<string, number> = ALL_CATALOGUE_TOOLS.reduce(
+  (acc, tool) => {
+    const cat = tool.category_id || "other";
+    acc[cat] = (acc[cat] || 0) + 1;
+    acc.all = (acc.all || 0) + 1;
+    return acc;
+  },
+  { all: 0 } as Record<string, number>,
+);
 
 export const categoriesQuery = {
   queryKey: ["tool-categories"],
@@ -112,12 +124,13 @@ export function toolsPageQuery(params: {
   search: string;
   categoryId: string | null;
   page: number;
+  sort?: ToolSortOption;
+  onlySlugs?: string[] | null;
 }) {
-  const { search, categoryId, page } = params;
+  const { search, categoryId, page, sort = "featured", onlySlugs = null } = params;
   return {
-    queryKey: ["tools", "list", search, categoryId, page],
+    queryKey: ["tools", "list", search, categoryId, page, sort, onlySlugs?.join(",") ?? "all"],
     queryFn: async (): Promise<{ tools: Tool[]; total: number }> => {
-      // Normalize category id (handles legacy 'cat-pdf' -> 'pdf', 'cat-image' -> 'image')
       const targetCat = categoryId
         ? categoryId
             .toLowerCase()
@@ -127,6 +140,11 @@ export function toolsPageQuery(params: {
         : null;
 
       let filtered = [...ALL_CATALOGUE_TOOLS];
+
+      if (onlySlugs) {
+        const set = new Set(onlySlugs);
+        filtered = filtered.filter((t) => set.has(t.slug));
+      }
 
       if (targetCat) {
         filtered = filtered.filter((t) => {
@@ -148,8 +166,13 @@ export function toolsPageQuery(params: {
         );
       }
 
-      // Sort featured first, then alphabetical
       filtered.sort((a, b) => {
+        if (sort === "popular") {
+          return (b.views || 0) - (a.views || 0);
+        }
+        if (sort === "az") {
+          return a.title.localeCompare(b.title);
+        }
         if (a.featured && !b.featured) return -1;
         if (!a.featured && b.featured) return 1;
         return a.title.localeCompare(b.title);
