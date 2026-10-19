@@ -90,6 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "ToolNami is a clean, fast platform of free online tools for everyday work — PDF, image, text, SEO and developer utilities.",
       },
       { name: "author", content: "Aniket Bhalerao — LuminaLM" },
+      { name: "google-adsense-account", content: "ca-pub-7693436223439269" },
       {
         name: "robots",
         content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
