@@ -65,7 +65,7 @@ async function sendNotificationEmail(data: z.infer<typeof contactSchema>) {
 }
 
 export const submitContactMessage = createServerFn({ method: "POST" })
-  .inputValidator((data) => contactSchema.parse(data))
+  .validator((data) => contactSchema.parse(data))
   .handler(async ({ data }) => {
     const supabaseUrl = process.env["SUPABASE_URL"];
     const supabaseKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
