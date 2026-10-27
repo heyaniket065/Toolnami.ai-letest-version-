@@ -21,6 +21,8 @@ import {
 import { useState } from "react";
 import { z } from "zod";
 
+import { toast } from "sonner";
+
 import { Reveal } from "@/components/site/reveal";
 import { submitContactMessage } from "@/lib/contact.functions";
 
@@ -66,6 +68,7 @@ export const Route = createFileRoute("/contact")({
 const schema = z.object({
   name: z.string().trim().min(2, "Please enter your name").max(100, "Name is too long"),
   email: z.string().trim().email("Enter a valid email address").max(255, "Email is too long"),
+  subject: z.string().trim().max(150).optional(),
   message: z
     .string()
     .trim()
@@ -74,6 +77,15 @@ const schema = z.object({
 });
 
 type Errors = Partial<Record<"name" | "email" | "message", string>>;
+
+const CONTACT_TOPICS = [
+  "General Inquiry",
+  "New Tool Request / Idea",
+  "Bug Report / Technical Issue",
+  "Business & Collaboration",
+  "Advertising & Sponsorship",
+  "Feedback & Appreciation",
+];
 
 const SOCIAL_LINKS = [
   {
@@ -203,7 +215,12 @@ const TAGLINES = [
 ];
 
 function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: "General Inquiry",
+    message: "",
+  });
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
@@ -226,13 +243,19 @@ function ContactPage() {
     setErrors({});
     setStatus("sending");
     try {
-      await submitContactMessage({ data: parsed.data });
+      const res = await submitContactMessage({ data: parsed.data });
+      if (!res.emailed && !res.savedToDb) {
+        setStatus("error");
+        toast.error("Could not send your message. Please try again or email directly.");
+        return;
+      }
+      setStatus("sent");
+      setForm({ name: "", email: "", subject: "General Inquiry", message: "" });
+      toast.success("Your message has been delivered directly to Aniket Bhalerao's email!");
     } catch {
       setStatus("error");
-      return;
+      toast.error("Something went wrong while sending your message.");
     }
-    setStatus("sent");
-    setForm({ name: "", email: "", message: "" });
   };
 
   return (
@@ -345,6 +368,24 @@ function ContactPage() {
                     </p>
                   ) : null}
                 </div>
+              </div>
+
+              <div className="mt-5">
+                <label htmlFor="subject" className="text-sm font-medium">
+                  Topic / Subject
+                </label>
+                <select
+                  id="subject"
+                  value={form.subject}
+                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                  className={`${field} mt-2 border-input focus:border-primary/50`}
+                >
+                  {CONTACT_TOPICS.map((topic) => (
+                    <option key={topic} value={topic}>
+                      {topic}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="mt-5">

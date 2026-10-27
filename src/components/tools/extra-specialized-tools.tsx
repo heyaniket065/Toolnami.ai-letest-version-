@@ -184,9 +184,10 @@ export function DiscountCalculatorTool() {
 
 // 3. World Clock Tool
 export function WorldClockTool() {
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    setCurrentTime(new Date());
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
@@ -204,19 +205,23 @@ export function WorldClockTool() {
     <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-soft max-w-3xl w-full mx-auto space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {timezones.map((tz) => {
-          const timeStr = currentTime.toLocaleTimeString("en-US", {
-            timeZone: tz.zone,
-            hour12: true,
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          });
-          const dateStr = currentTime.toLocaleDateString("en-US", {
-            timeZone: tz.zone,
-            weekday: "short",
-            month: "short",
-            day: "numeric",
-          });
+          const timeStr = currentTime
+            ? currentTime.toLocaleTimeString("en-US", {
+                timeZone: tz.zone,
+                hour12: true,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })
+            : "--:--:--";
+          const dateStr = currentTime
+            ? currentTime.toLocaleDateString("en-US", {
+                timeZone: tz.zone,
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+              })
+            : "---";
 
           return (
             <div
@@ -225,12 +230,18 @@ export function WorldClockTool() {
             >
               <div className="flex items-center justify-between">
                 <span className="text-xl">{tz.country}</span>
-                <span className="text-[11px] font-bold text-muted-foreground uppercase">
+                <span
+                  suppressHydrationWarning
+                  className="text-[11px] font-bold text-muted-foreground uppercase"
+                >
                   {dateStr}
                 </span>
               </div>
               <div className="text-sm font-bold text-foreground truncate">{tz.label}</div>
-              <div className="text-2xl font-black text-primary font-mono tracking-tight">
+              <div
+                suppressHydrationWarning
+                className="text-2xl font-black text-primary font-mono tracking-tight"
+              >
                 {timeStr}
               </div>
             </div>

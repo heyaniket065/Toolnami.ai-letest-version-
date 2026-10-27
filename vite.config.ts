@@ -14,8 +14,22 @@ export default defineConfig({
   },
   nitro: {
     preset: "node-server",
+    serverEntry: false,
   },
   vite: {
+    server: {
+      host: "0.0.0.0",
+      port: 3000,
+      hmr: false,
+      watch: {
+        ignored: [
+          "**/.output/**",
+          "**/dist/**",
+          "**/.tanstack/**",
+          "**/server.ts",
+        ],
+      },
+    },
     optimizeDeps: {
       entries: ["src/router.tsx", "src/routes/**/*.{ts,tsx}"],
       include: [

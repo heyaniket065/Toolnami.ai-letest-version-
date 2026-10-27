@@ -142,7 +142,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         avatar_url: firebaseUser.photoURL || null,
         theme_preference: "system",
       });
-      handleFirestoreError(err, OperationType.WRITE, `users/${firebaseUser.uid}`);
+      try {
+        handleFirestoreError(err, OperationType.WRITE, `users/${firebaseUser.uid}`);
+      } catch {
+        // Handled gracefully with local fallback profile
+      }
     }
   }, []);
 
@@ -185,7 +189,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         (err) => {
           console.warn("Firestore favorites listener notice:", err);
-          handleFirestoreError(err, OperationType.GET, favsPath);
+          try {
+            handleFirestoreError(err, OperationType.GET, favsPath);
+          } catch {
+            // Prevent uncaught listener exception from freezing UI
+          }
         },
       );
       return () => unsubscribe();
@@ -218,7 +226,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         (err) => {
           console.warn("Firestore history listener notice:", err);
-          handleFirestoreError(err, OperationType.GET, histPath);
+          try {
+            handleFirestoreError(err, OperationType.GET, histPath);
+          } catch {
+            // Prevent uncaught listener exception from freezing UI
+          }
         },
       );
       return () => unsubscribe();
@@ -393,7 +405,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       } catch (err) {
         console.warn("Failed to record tool history in Firestore:", err);
-        handleFirestoreError(err, OperationType.CREATE, histPath);
+        try {
+          handleFirestoreError(err, OperationType.CREATE, histPath);
+        } catch {
+          // Non-critical background history write; prevent uncaught exception
+        }
       }
     },
     [user],

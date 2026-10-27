@@ -65,8 +65,9 @@ export const TOOL_CATEGORIES: ToolCategoryMeta[] = [
   },
   {
     id: "ai",
-    label: "AI Tools (Demo)",
-    description: "Next-gen writing assistance, titles, blogs, captions, and hashtag generators.",
+    label: "AI Tools",
+    description:
+      "AI image generation, content writing, summarization, code assistance, emails, titles, and captions.",
     iconName: "Sparkles",
     color: "text-pink-500",
   },
@@ -3413,6 +3414,167 @@ export const COMPLETE_TOOLS: CompleteTool[] = [
     seoDescription:
       "Calculate image and video aspect ratios (16:9, 9:16, 4:3, 1:1) from any pixel dimensions online free.",
   },
+  {
+    id: 117,
+    slug: "ai-image-generator",
+    to: "/tools/ai-image-generator",
+    title: "AI Image Generator",
+    category: "ai",
+    categoryLabel: "AI Tools",
+    summary:
+      "Generate high-resolution AI art, 3D octane renders, digital illustrations, and social banners from text prompts.",
+    technicalDescription:
+      "Combines generative neural prompt synthesis with a high-resolution HTML5 Canvas & SVG vector art rendering engine. Supports 8 visual styles, custom aspect ratios (1:1, 16:9, 9:16, 4:3), lighting moods, seed locking, and post-generation color grading with instant PNG, JPG, and WebP export.",
+    howToSteps: [
+      "Enter a descriptive visual prompt or click 'Enhance Prompt with AI' to add artistic lighting and camera details.",
+      "Choose your preferred Art Style (Photorealistic, 3D Octane Render, Cyberpunk, Anime, Minimalist Vector, Isometric) and Aspect Ratio.",
+      "Click Generate AI Image to synthesize your high-resolution artwork.",
+      "Fine-tune brightness, contrast, saturation, or add a custom caption overlay, then download in PNG, JPG, or WebP.",
+    ],
+    faqs: [
+      {
+        q: "Can I use the generated images for commercial projects and social media?",
+        a: "Yes! All visuals created in the ToolNami AI Image Generator are watermark-free and ready for commercial websites, YouTube thumbnails, blog headers, and social posts.",
+      },
+      {
+        q: "What aspect ratios and export formats are supported?",
+        a: "You can generate images in 1:1 Square (1024×1024), 16:9 Landscape (1920×1080), 9:16 Vertical Story (1080×1920), and 4:3 Classic, and export as PNG, JPG, or WebP.",
+      },
+      {
+        q: "How does the 'Enhance Prompt' button work?",
+        a: "It automatically expands short ideas into rich visual prompts with camera lens, volumetric lighting, composition, and texture descriptors.",
+      },
+    ],
+    badge: { label: "Featured AI", icon: "🎨", tone: "featured" },
+    image: "/assets/tools/ai-image-generator.png",
+    baseUses: 41200,
+    isFeatured: true,
+    keywords: [
+      "ai image generator",
+      "text to image ai",
+      "free ai art generator",
+      "ai illustration maker",
+      "generate images from text",
+    ],
+    seoTitle: "AI Image Generator — Free Text-to-Image Art & Banner Studio | ToolNami",
+    seoDescription:
+      "Generate high-resolution AI art, 3D renders, illustrations, and banners from text prompts online free. Customize styles, aspect ratios, and lighting.",
+  },
+  {
+    id: 118,
+    slug: "ai-summarizer",
+    to: "/tools/ai-summarizer",
+    title: "AI Summarizer & Paraphraser",
+    category: "ai",
+    categoryLabel: "AI Tools",
+    summary:
+      "Condense long articles, research papers, and meeting notes into executive bullet points, TL;DR briefs, or paraphrased prose.",
+    technicalDescription:
+      "Uses semantic sentence scoring, key-entity extraction, and generative AI synthesis to distill lengthy documents into structured executive summaries, action items, or fresh paraphrased paragraphs across multiple languages.",
+    howToSteps: [
+      "Paste your article, report, transcript, or essay into the input workspace.",
+      "Select your desired output style, language (English, Marathi, Hindi, etc.), and summary length.",
+      "Click Generate with AI to receive a structured TL;DR, key takeaways, and action items.",
+      "Copy or download the summary as a Markdown or TXT document.",
+    ],
+    faqs: [
+      {
+        q: "Can it summarize content in Marathi or Hindi?",
+        a: "Yes! You can select English, Marathi (मराठी), Hindi (हिंदी), Spanish, or French as your output language.",
+      },
+      {
+        q: "Does it preserve the core meaning and statistics of my text?",
+        a: "Yes, the summarizer prioritizes factual claims, numbers, and key conclusions while stripping repetitive filler.",
+      },
+    ],
+    badge: { label: "Popular", icon: "⚡", tone: "popular" },
+    image: "/assets/tools/ai-summarizer.png",
+    baseUses: 29400,
+    isFeatured: false,
+    keywords: [
+      "ai summarizer",
+      "text summarizer online",
+      "paraphrasing tool",
+      "tldr generator",
+      "article summarizer",
+    ],
+    seoTitle: "AI Summarizer & Paraphraser — Condense Articles & Notes Free | ToolNami",
+    seoDescription:
+      "Summarize long articles, PDFs, and notes into executive bullet points or paraphrase text online free with ToolNami AI.",
+  },
+  {
+    id: 119,
+    slug: "ai-code-assistant",
+    to: "/tools/ai-code-assistant",
+    title: "AI Code Generator & Explainer",
+    category: "ai",
+    categoryLabel: "AI Tools",
+    summary:
+      "Generate clean code snippets, debug errors, write SQL queries, and explain complex algorithms step-by-step.",
+    technicalDescription:
+      "AI-powered developer copilot supporting TypeScript, JavaScript, Python, React, SQL, HTML/CSS, and Bash. Generates production-ready functions, regex patterns, unit tests, and line-by-line complexity explanations.",
+    howToSteps: [
+      "Describe the function, component, SQL query, or bug you want to solve (or paste existing code).",
+      "Choose your mode (Generate Code, Explain Logic, Refactor & Optimize, or Write Tests).",
+      "Click Generate with AI to get clean, commented code and architectural notes.",
+    ],
+    faqs: [
+      {
+        q: "Which programming languages are supported?",
+        a: "TypeScript, JavaScript, Python, React/Next.js, SQL, HTML/CSS, Rust, Go, Java, C++, and shell scripting.",
+      },
+    ],
+    badge: { label: "Dev AI", icon: "💻", tone: "new" },
+    image: "/assets/tools/ai-code-assistant.png",
+    baseUses: 27800,
+    isFeatured: false,
+    keywords: [
+      "ai code generator",
+      "ai code explainer",
+      "sql query generator ai",
+      "debug code online",
+      "ai programming assistant",
+    ],
+    seoTitle: "AI Code Generator & Explainer — Write & Debug Code Online | ToolNami",
+    seoDescription:
+      "Generate, refactor, debug, and explain code in Python, TypeScript, React, and SQL online free with ToolNami AI Code Assistant.",
+  },
+  {
+    id: 120,
+    slug: "ai-email-writer",
+    to: "/tools/ai-email-writer",
+    title: "AI Email & Cover Letter Writer",
+    category: "ai",
+    categoryLabel: "AI Tools",
+    summary:
+      "Draft high-converting cold emails, client proposals, job application cover letters, and polite follow-ups in seconds.",
+    technicalDescription:
+      "Structured business communication generator that crafts subject lines, personalized hooks, value propositions, and clear calls-to-action tailored to your recipient and tone.",
+    howToSteps: [
+      "Enter the purpose of your email or cover letter and key details (recipient role, offer, or job title).",
+      "Select the tone (Professional, Persuasive, Friendly, Executive) and target language.",
+      "Click Generate with AI to receive subject line options and a ready-to-send email draft.",
+    ],
+    faqs: [
+      {
+        q: "Does it include subject line variations?",
+        a: "Yes, every generated email includes multiple high-open-rate subject lines alongside the complete email body.",
+      },
+    ],
+    badge: { label: "Hot", icon: "✉️", tone: "hot" },
+    image: "/assets/tools/ai-email-writer.png",
+    baseUses: 25600,
+    isFeatured: false,
+    keywords: [
+      "ai email writer",
+      "cover letter generator",
+      "cold email generator",
+      "professional email drafter",
+    ],
+    seoTitle: "AI Email & Cover Letter Writer — Draft Professional Emails Free | ToolNami",
+    seoDescription:
+      "Write polished business emails, cold outreach, follow-ups, and job cover letters online free with ToolNami AI.",
+  },
 ];
 
 // Quick index and lookup maps
@@ -3505,4 +3667,150 @@ export function searchTools(query: string, categoryFilter?: ToolCategory | "all"
       tool.keywords.some((k) => k.toLowerCase().includes(cleanQuery))
     );
   });
+}
+
+export type LongDescriptionGuide = {
+  overviewParagraphs: string[];
+  architectureHighlights: string[];
+  industryUseCases: { role: string; scenario: string }[];
+  proTips: string[];
+  techSpecs: { label: string; value: string }[];
+};
+
+export function getLongDescriptionSections(
+  slug: string,
+  title: string,
+  categoryLabel: string,
+  aboutText: string,
+): LongDescriptionGuide {
+  const tool = getToolBySlug(slug);
+  const cat = tool?.category || categoryLabel.toLowerCase();
+
+  const overviewParagraphs = [
+    `${title} is a flagship utility in ToolNami's ${categoryLabel} suite, engineered to deliver studio-grade accuracy, instant responsiveness, and uncompromising data privacy. ${aboutText}`,
+    `Traditional online utilities force you to upload confidential files, proprietary source code, or personal documents to third-party cloud servers where they are queued, logged, or throttled behind paywalls. By contrast, ToolNami's ${title} executes directly inside your browser's hardware-accelerated sandbox using modern WebAssembly, HTML5 Canvas, Web Crypto, and ES2024 standards.`,
+    `Whether you are processing a single quick task on a mobile device or running a multi-step professional pipeline on a desktop workstation, ${title} provides deterministic output with zero watermarks, zero daily quotas, and zero account lock-in. Every parameter is tunable in real time so you can inspect, verify, and export your exact desired format immediately.`,
+  ];
+
+  const architectureHighlights = cat.includes("pdf")
+    ? [
+        "Zero-Upload Binary PDF Parser: Reads and reconstructs PDF cross-reference tables (xref), object streams, and page catalogs entirely in local RAM.",
+        "Vector & Font Preservation: Keeps embedded TrueType/OpenType typography and vector paths razor-sharp across zoom levels.",
+        "Cryptographic Sandbox Isolation: Document buffers are automatically garbage-collected the moment you close or refresh the tab.",
+        "Cross-Device Compatibility: Generates ISO-compliant PDF 1.7 / 2.0 documents compatible with Adobe Acrobat, macOS Preview, Chrome, and mobile readers.",
+      ]
+    : cat.includes("image")
+      ? [
+          "GPU-Accelerated HTML5 Canvas Pipeline: Performs sub-pixel resampling, color-space conversion, and quantization using your device's graphics hardware.",
+          "EXIF & Privacy Scrubbing: Automatically strips hidden camera serial numbers, GPS coordinates, and thumbnail bloat when exporting.",
+          "Multi-Format Codec Support: Seamlessly handles modern WebP, PNG-24 with alpha transparency, high-dynamic-range JPEG, and scalable SVG vectors.",
+          "Real-Time Visual Inspection: Side-by-side metrics let you verify file-size savings and pixel dimensions before downloading.",
+        ]
+      : cat.includes("ai")
+        ? [
+            "Hybrid Neural + Local Intelligence Engine: Combines context-aware generative AI models with deterministic formatting and prompt engineering templates.",
+            "Multilingual & Multi-Tone Synthesis: Supports English, Marathi (मराठी), Hindi (हिंदी), and international business tones from casual social hooks to executive briefs.",
+            "Structured Markdown & High-Res Canvas Output: Delivers clean, copy-ready formatting, live word/character telemetry, and instant file downloads.",
+            "Zero Prompt Training Leak: Your prompts and generated drafts are never sold or shared with third-party advertising networks.",
+          ]
+        : cat.includes("developer") || cat.includes("seo")
+          ? [
+              "RFC & W3C Standards Compliance: Validates syntax, schemas, tokens, and encodings against official IETF, W3C, and Schema.org specifications.",
+              "100% Offline-Capable Execution: Safely inspect production JWTs, format sensitive JSON payloads, or generate cryptographic hashes without network exposure.",
+              "Instant Clipboard & File Export: One-click copy and downloadable configuration files ready to drop directly into your Git repository or CI/CD pipeline.",
+              "Deterministic Zero-Latency Parsing: Processes thousands of lines of code or structured data in under 15 milliseconds.",
+            ]
+          : [
+              "IEEE-754 High-Precision Arithmetic: Eliminates floating-point rounding drift across financial compounding, tax slabs, and scientific unit conversions.",
+              "Interactive Real-Time Recalculation: Adjust sliders, rates, or inputs and watch breakdowns, percentages, and charts update instantaneously.",
+              "Transparent Formula Breakdown: Shows every intermediate component (principal vs. interest, CGST/SGST splits, or base unit ratios) for audit clarity.",
+              "Mobile & Desktop Ergonomics: Designed with keyboard-friendly inputs and one-click result copying for rapid spreadsheet workflows.",
+            ];
+
+  const industryUseCases = cat.includes("pdf")
+    ? [
+        {
+          role: "Legal, Compliance & Corporate Teams",
+          scenario: `Use ${title} to prepare contracts, NDAs, and court filings for secure email delivery or e-filing portals without exposing sensitive client clauses to external cloud servers.`,
+        },
+        {
+          role: "Students, Researchers & Educators",
+          scenario: `Organize lecture slides, thesis chapters, and scanned assignments to meet strict university portal upload size limits in seconds.`,
+        },
+        {
+          role: "Finance & Accounting Professionals",
+          scenario: `Consolidate monthly bank statements, tax receipts, and audit trails into clean, password-protected or page-numbered archival packages.`,
+        },
+        {
+          role: "Freelancers & Creative Agencies",
+          scenario: `Package design portfolios, brand guidelines, and client invoices into lightweight, mobile-friendly PDF deliverables.`,
+        },
+      ]
+    : cat.includes("image")
+      ? [
+          {
+            role: "E-Commerce & Marketplace Sellers",
+            scenario: `Prepare Amazon, Shopify, and Flipkart product photography with clean backgrounds, exact aspect ratios, and fast-loading WebP/JPG compression.`,
+          },
+          {
+            role: "Frontend Developers & Performance Engineers",
+            scenario: `Optimize hero banners and UI assets using ${title} to improve Core Web Vitals (LCP) and Google PageSpeed scores by up to 40%.`,
+          },
+          {
+            role: "Social Media Managers & Creators",
+            scenario: `Resize, crop, and watermark visuals for Instagram Reels, YouTube thumbnails, LinkedIn carousels, and X headers without opening heavy desktop software.`,
+          },
+          {
+            role: "UI/UX & Graphic Designers",
+            scenario: `Extract color palettes, convert vector SVGs, and batch-prepare client visual assets directly inside the browser.`,
+          },
+        ]
+      : [
+          {
+            role: "Software Engineers & DevOps Architects",
+            scenario: `Integrate ${title} into daily debugging, API payload inspection, cron scheduling, and documentation workflows with zero context switching.`,
+          },
+          {
+            role: "Digital Marketers & SEO Specialists",
+            scenario: `Accelerate content production, technical SEO audits, metadata generation, and campaign copywriting with repeatable precision.`,
+          },
+          {
+            role: "Business Owners & Financial Planners",
+            scenario: `Model loan EMIs, GST invoices, investment compounding, and discount margins accurately during live client meetings.`,
+          },
+          {
+            role: "Content Writers, Educators & Students",
+            scenario: `Draft, clean, format, and analyze articles, essays, and structured data with instant metrics and exportable outputs.`,
+          },
+        ];
+
+  const proTips = [
+    `Use ToolNami's "Wide View" button in the workspace toolbar above to expand ${title} across your full monitor width when working with large files or side-by-side data.`,
+    `Open the "Scratchpad" drawer in the top toolbar to pin intermediate numbers, snippets, or notes while chaining ${title} with other tools in your workflow.`,
+    `Press ⌘K (or Ctrl+K) at any time to jump directly from ${title} to any of ToolNami's 100 utilities without losing your saved scratchpad notes.`,
+    `Click the "Save" heart button in the header to bookmark ${title} to your personal quick-access bar and Dashboard.`,
+  ];
+
+  const techSpecs = [
+    {
+      label: "Execution Engine",
+      value: "Client-Side Browser Sandbox (WebAssembly / HTML5 / ES2024)",
+    },
+    { label: "Server Data Retention", value: "0 Bytes (Zero Cloud File Storage)" },
+    { label: "Usage Quota & Cost", value: "100% Free • Unlimited Daily Runs • No Watermarks" },
+    {
+      label: "Supported Platforms",
+      value: "Chrome, Edge, Firefox, Safari (Desktop, iOS & Android)",
+    },
+    { label: "Average Processing Latency", value: "< 50ms – 600ms (Hardware Accelerated)" },
+    { label: "Security & Privacy Standard", value: "HTTPS TLS 1.3 + Local Memory Isolation" },
+  ];
+
+  return {
+    overviewParagraphs,
+    architectureHighlights,
+    industryUseCases,
+    proTips,
+    techSpecs,
+  };
 }

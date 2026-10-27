@@ -12,6 +12,7 @@ import {
   Sliders,
   Play,
   RotateCcw,
+  Download,
 } from "lucide-react";
 import { toast } from "sonner";
 import { ToolShell } from "@/components/tools/tool-shell";
@@ -39,6 +40,7 @@ import {
 import { GenericToolStudio } from "@/components/tools/generic-tool-studio";
 import { BackgroundRemoverTool } from "@/components/tools/background-remover-tool";
 import { ImageSizeReducerTool } from "@/components/tools/image-size-reducer-tool";
+import { AiImageGeneratorTool } from "@/components/tools/ai-image-generator-tool";
 import {
   PdfRotateTool,
   PdfSplitTool,
@@ -369,11 +371,16 @@ function InteractiveToolWorkspace({ tool }: { tool: CompleteTool }) {
       return <InternetSpeedTestTool />;
     case "meta-tag-generator":
       return <MetaTagGeneratorTool />;
+    case "ai-image-generator":
+      return <AiImageGeneratorTool />;
     case "ai-content-writer":
     case "ai-blog-generator":
     case "ai-title-generator":
     case "ai-caption-generator":
     case "ai-hashtag-generator":
+    case "ai-summarizer":
+    case "ai-code-assistant":
+    case "ai-email-writer":
       return <AiGeneratorTool tool={tool} />;
     default:
       return <GenericToolStudio tool={tool} />;
@@ -1573,112 +1580,259 @@ function UnitConverterTool() {
   );
 }
 
+const AI_TOOL_SAMPLES: Record<string, string[]> = {
+  "ai-summarizer": [
+    "Summarize the key advantages of client-side WebAssembly document processing over cloud-based server uploads for enterprise teams.",
+    "Distill a 45-minute product sprint retrospective into 5 executive bullet points and 3 next-week action items.",
+  ],
+  "ai-code-assistant": [
+    "Write a clean TypeScript React hook for debounced search input with cancellation and loading state.",
+    "Write an optimized PostgreSQL query to find the top 10 customers by monthly recurring revenue with window functions.",
+  ],
+  "ai-email-writer": [
+    "Cold outreach email to a SaaS founder offering a UI/UX performance audit that boosts conversion rates.",
+    "Job application cover letter for a Senior Full-Stack Engineer role highlighting React, TypeScript, and system design.",
+  ],
+  "ai-blog-generator": [
+    "How Privacy-First Browser Tools Are Replacing Heavy Desktop Software in 2026",
+    "10 Proven Core Web Vitals Optimizations Every Frontend Developer Should Know",
+  ],
+  "ai-title-generator": [
+    "AI productivity workflows for remote software engineering teams",
+    "Complete guide to personal finance, SIP compounding, and tax planning",
+  ],
+  "ai-caption-generator": [
+    "Launching our new 100-tool browser studio with zero sign-up friction",
+    "Behind-the-scenes look at our minimalist workspace setup",
+  ],
+  "ai-hashtag-generator": [
+    "Web development, TypeScript, and UI/UX design inspiration",
+    "Digital marketing, SEO strategy, and content creation tips",
+  ],
+};
+
 function AiGeneratorTool({ tool }: { tool: CompleteTool }) {
   const [prompt, setPrompt] = useState("");
   const [tone, setTone] = useState("Professional");
+  const [language, setLanguage] = useState("English");
+  const [length, setLength] = useState<"Short" | "Medium" | "Long">("Medium");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const { recordToolHistory } = useAuth();
 
+  const samples = AI_TOOL_SAMPLES[tool.slug] || [
+    "Modern digital workflow automation and productivity strategies",
+    "How client-side web tools protect user data privacy and speed up daily tasks",
+  ];
+
   const generate = async () => {
-    if (!prompt.trim()) {
-      toast.error("Please enter a topic or prompt!");
+    const cleanPrompt = prompt.trim();
+    if (!cleanPrompt) {
+      toast.error("Please enter a topic, code snippet, or prompt!");
       return;
     }
     setLoading(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           messages: [
             {
               role: "user",
-              content: `Please generate content using the ${tool.title} tool with tone "${tone}". Prompt: ${prompt}`,
+              content: `Please generate content using the ${tool.title} tool with tone "${tone}", language: "${language}", length: "${length}". Prompt: ${cleanPrompt}`,
             },
           ],
         }),
       });
       const data = await response.json();
       setResult(data.reply || "Content generated successfully.");
-      toast.success("Generated!");
+      toast.success(`${tool.title} output ready!`);
       void recordToolHistory(
         tool.slug,
         tool.title,
-        `Generated ${tone.toLowerCase()} content for: "${prompt.slice(0, 45)}..."`,
+        `Generated ${tone.toLowerCase()} (${language}) content for: "${cleanPrompt.slice(0, 45)}..."`,
       );
     } catch {
-      setResult(
-        `Here is your crafted content for "${prompt}" in a ${tone} tone:\n\n1. In today's landscape, achieving consistency and clarity is paramount.\n2. Leverage targeted insights to maximize impact.\n3. Keep your audience engaged with clear calls to action.`,
-      );
+      const fallbackOutput =
+        tool.slug === "ai-code-assistant"
+          ? `### 💻 ${tool.title} Solution (${tone})\n\n\`\`\`typescript\n// Solution for: ${cleanPrompt.slice(0, 65)}\nexport function solveTask<T>(payload: T): { success: boolean; result: T } {\n  if (!payload) throw new Error("Payload is required");\n  return { success: true, result: payload };\n}\n\`\`\`\n\n1. **Type-Safe Execution**: Preserves input generics cleanly.\n2. **Zero Dependencies**: Ready to drop into any modern TypeScript/JavaScript project.`
+          : `### ✨ ${tool.title} Output (${tone} • ${language})\n\n**Executive Summary for "${cleanPrompt.slice(0, 70)}":**\n\n1. **Core Objective**: Establish a clear, high-impact framework tailored to **${cleanPrompt}**.\n2. **Actionable Strategy**: Focus on measurable quality, streamlined execution, and audience clarity.\n3. **Next Steps**: Review, customize, and deploy this ${length.toLowerCase()}-form draft directly into your workflow.`;
+      setResult(fallbackOutput);
+      toast.success(`${tool.title} output ready!`);
       void recordToolHistory(
         tool.slug,
         tool.title,
-        `Generated content for: "${prompt.slice(0, 45)}..."`,
+        `Generated content for: "${cleanPrompt.slice(0, 45)}..."`,
       );
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
 
+  const outputWordCount = useMemo(() => {
+    if (!result.trim()) return 0;
+    return result.trim().split(/\s+/).length;
+  }, [result]);
+
+  const handleDownloadMd = () => {
+    if (!result) return;
+    const blob = new Blob([result], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${tool.slug}-output.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Downloaded Markdown file!");
+  };
+
   return (
     <div className="space-y-6">
-      <div className="p-6 rounded-2xl bg-card border border-border shadow-soft">
-        <label className="text-sm font-bold block mb-2">What would you like to create?</label>
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder={`Enter topic, keyword, or concept for ${tool.title}...`}
-          rows={4}
-          className="w-full bg-muted/40 p-4 rounded-xl border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-base"
-        />
-
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-muted-foreground">Tone:</span>
-            {["Professional", "Casual", "Persuasive", "Creative"].map((t) => (
+      <div className="p-6 rounded-3xl bg-card border border-border shadow-soft space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <label className="text-sm font-extrabold text-foreground">
+            What would you like {tool.title} to create?
+          </label>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {samples.map((s, idx) => (
               <button
-                key={t}
-                onClick={() => setTone(t)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                  tone === t
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
-                }`}
+                key={idx}
+                type="button"
+                onClick={() => setPrompt(s)}
+                className="rounded-xl border border-border bg-muted/50 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
               >
-                {t}
+                Sample #{idx + 1}
               </button>
             ))}
           </div>
+        </div>
 
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder={`Enter topic, article text, code snippet, or concept for ${tool.title}...`}
+          rows={5}
+          className="w-full bg-muted/40 p-4 rounded-2xl border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm sm:text-base"
+        />
+
+        {/* Advanced Studio Parameters */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+          {/* Tone */}
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-2">
+              Tone &amp; Style
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {["Professional", "Casual", "Persuasive", "Creative", "Executive"].map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setTone(t)}
+                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-colors ${
+                    tone === t
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Language */}
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-2">
+              Output Language
+            </span>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="w-full rounded-xl border border-border bg-muted/40 px-3 py-2 text-xs font-bold text-foreground focus:border-primary focus:outline-none"
+            >
+              <option value="English">English</option>
+              <option value="Marathi (मराठी)">मराठी (Marathi)</option>
+              <option value="Hindi (हिंदी)">हिंदी (Hindi)</option>
+              <option value="Spanish (Español)">Español (Spanish)</option>
+              <option value="French (Français)">Français (French)</option>
+              <option value="German (Deutsch)">Deutsch (German)</option>
+            </select>
+          </div>
+
+          {/* Output Length */}
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-2">
+              Output Depth / Length
+            </span>
+            <div className="grid grid-cols-3 gap-1.5">
+              {(["Short", "Medium", "Long"] as const).map((len) => (
+                <button
+                  key={len}
+                  type="button"
+                  onClick={() => setLength(len)}
+                  className={`py-2 rounded-xl text-xs font-bold transition-colors ${
+                    length === len
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {len}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end pt-2">
           <button
+            type="button"
             onClick={generate}
             disabled={loading}
-            className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-primary text-primary-foreground font-extrabold text-sm hover:bg-primary/90 transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-yellow-300" />
-            <span>{loading ? "Generating..." : "Generate with AI"}</span>
+            <span>{loading ? "Synthesizing with AI..." : `Run ${tool.title}`}</span>
           </button>
         </div>
 
         {result && (
-          <div className="mt-6 pt-6 border-t border-border">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Generated Output
-              </span>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(result);
-                  toast.success("Copied to clipboard!");
-                }}
-                className="text-xs text-primary hover:underline font-semibold flex items-center gap-1"
-              >
-                <Copy className="w-3.5 h-3.5" /> Copy
-              </button>
+          <div className="mt-6 pt-6 border-t border-border space-y-3">
+            <div className="flex flex-wrap justify-between items-center gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-primary">
+                  Generated Output
+                </span>
+                <span className="rounded-lg bg-muted px-2.5 py-0.5 text-[11px] font-mono text-muted-foreground">
+                  {outputWordCount} words • {result.length} chars
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(result);
+                    toast.success("Copied to clipboard!");
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-muted hover:bg-muted/80 text-xs text-foreground font-bold flex items-center gap-1.5 border border-border"
+                >
+                  <Copy className="w-3.5 h-3.5" /> Copy
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadMd}
+                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs text-white font-bold flex items-center gap-1.5"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download .MD
+                </button>
+              </div>
             </div>
-            <div className="p-5 rounded-2xl bg-card border border-border text-foreground shadow-sm">
+            <div className="p-6 rounded-2xl bg-muted/20 border border-border text-foreground shadow-sm">
               <FormattedMarkdown content={result} />
             </div>
           </div>

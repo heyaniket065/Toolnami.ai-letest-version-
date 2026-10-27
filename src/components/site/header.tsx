@@ -144,7 +144,7 @@ export function Header() {
                       <Link
                         key={cat.id}
                         to="/tools"
-                        search={{ cat: cat.id, page: 1 }}
+                        search={{ category: cat.slug, page: 1 }}
                         onClick={() => setCatOpen(false)}
                         className="group flex items-start gap-3 rounded-2xl p-2.5 transition-colors hover:bg-primary-soft/60"
                       >
@@ -250,7 +250,7 @@ export function Header() {
                 <Link
                   key={cat.id}
                   to="/tools"
-                  search={{ cat: cat.id, page: 1 }}
+                  search={{ category: cat.slug, page: 1 }}
                   onClick={() => setOpen(false)}
                   className="flex items-center justify-between rounded-xl border border-border/60 bg-card px-3 py-2 text-xs font-semibold text-foreground hover:border-primary/40 hover:text-primary"
                 >

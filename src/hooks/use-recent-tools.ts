@@ -102,13 +102,22 @@ export function findWorkflowForTool(slug: string): {
   return null;
 }
 
+const memoryArrayCache = new Map<string, string[]>();
+
 function readStorageArray(key: string): string[] {
   if (typeof window === "undefined") return [];
+  const cached = memoryArrayCache.get(key);
+  if (cached) return cached;
   try {
     const raw = window.localStorage.getItem(key);
-    if (!raw) return [];
+    if (!raw) {
+      memoryArrayCache.set(key, []);
+      return [];
+    }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [];
+    const valid = Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [];
+    memoryArrayCache.set(key, valid);
+    return valid;
   } catch {
     return [];
   }
@@ -116,6 +125,7 @@ function readStorageArray(key: string): string[] {
 
 function writeStorageArray(key: string, items: string[]) {
   if (typeof window === "undefined") return;
+  memoryArrayCache.set(key, items);
   try {
     window.localStorage.setItem(key, JSON.stringify(items));
     window.dispatchEvent(new CustomEvent(SYNC_EVENT));
@@ -147,7 +157,13 @@ export function useRecentAndSavedTools() {
 
   useEffect(() => {
     syncFromStorage();
-    const onStorage = () => syncFromStorage();
+    const onStorage = (e: Event) => {
+      if (e.type === "storage") {
+        memoryArrayCache.delete(RECENT_STORAGE_KEY);
+        memoryArrayCache.delete(GUEST_FAV_STORAGE_KEY);
+      }
+      syncFromStorage();
+    };
     window.addEventListener("storage", onStorage);
     window.addEventListener(SYNC_EVENT, onStorage);
     return () => {
@@ -159,6 +175,7 @@ export function useRecentAndSavedTools() {
   const recordToolVisit = useCallback((slug: string) => {
     if (!slug || typeof window === "undefined") return;
     const current = readStorageArray(RECENT_STORAGE_KEY);
+    if (current[0] === slug) return;
     const updated = [slug, ...current.filter((s) => s !== slug)].slice(0, 8);
     writeStorageArray(RECENT_STORAGE_KEY, updated);
   }, []);

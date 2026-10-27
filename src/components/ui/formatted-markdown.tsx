@@ -1,6 +1,6 @@
-import { type ReactNode, useMemo } from "react";
+import React, { type ReactNode, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Copy, Check } from "lucide-react";
 
 interface FormattedMarkdownProps {
   content: string;
@@ -9,29 +9,28 @@ interface FormattedMarkdownProps {
 }
 
 /**
- * Parses inline text including:
- * - Markdown & WhatsApp bold: **text** and *text*
- * - Markdown & WhatsApp italic: _text_
- * - Strikethrough: ~text~ and ~~text~~
- * - Inline code: `text`
- * - Markdown links: [Label](url) or **[Label](url)**
+ * Fast, linear-time inline markdown parser without lookbehinds or catastrophic backtracking.
+ * Supports:
+ * - Markdown links: [Label](url)
+ * - Bold: **text**
+ * - Inline code: `code`
+ * - Italic: *text* or _text_
+ * - Strikethrough: ~~text~~
  */
 function parseInlineFormatting(
   text: string,
   onLinkClick?: () => void,
-  keyPrefix: string = "inline",
+  keyPrefix: string = "in",
+  depth: number = 0,
 ): ReactNode[] {
   if (!text) return [];
+  if (depth > 2 || text.length > 4000) {
+    return [<span key={`${keyPrefix}-plain`}>{text}</span>];
+  }
 
-  // Regex that captures:
-  // 1. Markdown links: \[([^\]]+)\]\(([^)]+)\)
-  // 2. Bold double asterisks: \*\*([^*]+)\*\*
-  // 3. WhatsApp single asterisks bold (word bounded): (?<=^|[\s(])\*([^*\n]+)\*(?=[\s.,!?:;)]|$)
-  // 4. WhatsApp / Markdown italic underscores: (?<=^|[\s(])_([^_\n]+)_(?=[\s.,!?:;)]|$)
-  // 5. Strikethrough: ~+([^~\n]+)~+
-  // 6. Inline code: `([^`\n]+)`
+  // Linear-time regex without lookbehinds
   const tokenRegex =
-    /(\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|(?<=^|[\s(])\*([^*\n]+)\*(?=[\s.,!?:;)]|$)|(?<=^|[\s(])_([^_\n]+)_(?=[\s.,!?:;)]|$)|~+([^~\n]+)~+|`([^`\n]+)`)/g;
+    /(\[([^\][\n]+)\]\(([^)\s]+)\)|\*\*([^*\n]+)\*\*|`([^`\n]+)`|~~([^~\n]+)~~|\*([^*\n]+)\*)/g;
 
   const elements: ReactNode[] = [];
   let lastIndex = 0;
@@ -42,7 +41,7 @@ function parseInlineFormatting(
     const matchIndex = match.index;
     if (matchIndex > lastIndex) {
       elements.push(
-        <span key={`${keyPrefix}-txt-${idx++}`}>{text.substring(lastIndex, matchIndex)}</span>,
+        <span key={`${keyPrefix}-t-${idx++}`}>{text.substring(lastIndex, matchIndex)}</span>,
       );
     }
 
@@ -50,94 +49,151 @@ function parseInlineFormatting(
     const linkText = match[2];
     const linkHref = match[3];
     const boldDouble = match[4];
-    const boldSingle = match[5];
-    const italicUnder = match[6];
-    const strikeText = match[7];
-    const codeText = match[8];
+    const codeText = match[5];
+    const strikeText = match[6];
+    const italicSingle = match[7];
 
-    if (linkHref) {
-      // It's a markdown link [Label](url)
+    if (linkHref && linkText) {
       const isInternal = linkHref.startsWith("/") || linkHref.startsWith("#");
-      elements.push(
-        <Link
-          key={`${keyPrefix}-link-${idx++}`}
-          to={linkHref}
-          onClick={onLinkClick}
-          className="inline-flex items-center gap-1 font-semibold text-primary underline underline-offset-2 decoration-primary/40 hover:text-primary hover:decoration-primary transition-colors cursor-pointer"
-        >
-          <span>{linkText}</span>
-          {!isInternal && <ExternalLink className="size-3 inline opacity-70" />}
-        </Link>,
-      );
-    } else if (boldDouble !== undefined || boldSingle !== undefined) {
-      const boldContent = boldDouble ?? boldSingle;
-      // Recursively parse inline styles inside bold if any (e.g. bold link)
+      if (isInternal) {
+        elements.push(
+          <Link
+            key={`${keyPrefix}-lnk-${idx++}`}
+            to={linkHref}
+            onClick={onLinkClick}
+            className="inline-flex items-center gap-1 font-semibold text-primary underline underline-offset-2 decoration-primary/40 hover:text-primary hover:decoration-primary transition-colors cursor-pointer"
+          >
+            <span>{linkText.replace(/^\*\*|\*\*$/g, "")}</span>
+          </Link>,
+        );
+      } else {
+        elements.push(
+          <a
+            key={`${keyPrefix}-ext-${idx++}`}
+            href={linkHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={onLinkClick}
+            className="inline-flex items-center gap-1 font-semibold text-primary underline underline-offset-2 decoration-primary/40 hover:text-primary hover:decoration-primary transition-colors cursor-pointer"
+          >
+            <span>{linkText.replace(/^\*\*|\*\*$/g, "")}</span>
+            <ExternalLink className="size-3 inline opacity-70" />
+          </a>,
+        );
+      }
+    } else if (boldDouble !== undefined) {
       elements.push(
         <strong
           key={`${keyPrefix}-b-${idx++}`}
           className="font-bold text-foreground tracking-tight"
         >
-          {parseInlineFormatting(boldContent, onLinkClick, `${keyPrefix}-sub-b`)}
+          {parseInlineFormatting(boldDouble, onLinkClick, `${keyPrefix}-sb-${idx}`, depth + 1)}
         </strong>,
-      );
-    } else if (italicUnder !== undefined) {
-      elements.push(
-        <em key={`${keyPrefix}-em-${idx++}`} className="italic text-foreground/90 font-medium">
-          {parseInlineFormatting(italicUnder, onLinkClick, `${keyPrefix}-sub-em`)}
-        </em>,
-      );
-    } else if (strikeText !== undefined) {
-      elements.push(
-        <del
-          key={`${keyPrefix}-del-${idx++}`}
-          className="line-through text-muted-foreground opacity-80"
-        >
-          {strikeText}
-        </del>,
       );
     } else if (codeText !== undefined) {
       elements.push(
         <code
-          key={`${keyPrefix}-code-${idx++}`}
-          className="px-1.5 py-0.5 rounded-md bg-muted font-mono text-[13px] text-primary font-semibold border border-border/60"
+          key={`${keyPrefix}-c-${idx++}`}
+          className="px-1.5 py-0.5 rounded-md bg-muted font-mono text-[12px] sm:text-[13px] text-primary font-semibold border border-border/60 break-all"
         >
           {codeText}
         </code>,
       );
+    } else if (strikeText !== undefined) {
+      elements.push(
+        <del key={`${keyPrefix}-d-${idx++}`} className="line-through text-muted-foreground">
+          {strikeText}
+        </del>,
+      );
+    } else if (italicSingle !== undefined) {
+      elements.push(
+        <em key={`${keyPrefix}-i-${idx++}`} className="italic text-foreground/90 font-medium">
+          {italicSingle}
+        </em>,
+      );
     } else {
-      elements.push(<span key={`${keyPrefix}-raw-${idx++}`}>{fullMatch}</span>);
+      elements.push(<span key={`${keyPrefix}-r-${idx++}`}>{fullMatch}</span>);
     }
 
     lastIndex = matchIndex + fullMatch.length;
   }
 
   if (lastIndex < text.length) {
-    elements.push(<span key={`${keyPrefix}-txt-end`}>{text.substring(lastIndex)}</span>);
+    elements.push(<span key={`${keyPrefix}-end`}>{text.substring(lastIndex)}</span>);
   }
 
   return elements;
 }
 
-/**
- * Robust, high-fidelity markdown & WhatsApp-style text renderer.
- * Handles headings (hiding ### and styling as proper bold headers),
- * WhatsApp formatting (*bold*, _italic_, ~strike~), lists, links,
- * and horizontal rules without raw syntax clutter.
- */
-export function FormattedMarkdown({
+function CodeBlockView({ lang, code }: { lang: string; code: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      void navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    }
+  };
+
+  return (
+    <div className="my-3 rounded-xl overflow-hidden border border-border bg-slate-950 text-slate-100 shadow-sm">
+      <div className="flex items-center justify-between px-3.5 py-1.5 bg-slate-900 border-b border-slate-800 text-[11px] font-mono text-slate-400">
+        <span className="uppercase font-bold text-primary">{lang || "code"}</span>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="inline-flex items-center gap-1 text-slate-300 hover:text-white font-sans font-semibold text-[11px]"
+        >
+          {copied ? (
+            <>
+              <Check className="w-3 h-3 text-emerald-400" />
+              <span className="text-emerald-400">Copied</span>
+            </>
+          ) : (
+            <>
+              <Copy className="w-3 h-3" />
+              <span>Copy</span>
+            </>
+          )}
+        </button>
+      </div>
+      <pre className="p-3.5 text-xs sm:text-[13px] font-mono leading-relaxed overflow-x-auto">
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
+function isHorizontalRule(line: string): boolean {
+  const trimmed = line.trim();
+  if (trimmed.length < 3 || trimmed.length > 40) return false;
+  return /^[-*_]+$/.test(trimmed.replace(/\s+/g, ""));
+}
+
+export const FormattedMarkdown = React.memo(function FormattedMarkdown({
   content,
   className = "",
   onLinkClick,
 }: FormattedMarkdownProps) {
+  const linkClickRef = useRef(onLinkClick);
+  linkClickRef.current = onLinkClick;
+
   const renderedBlocks = useMemo(() => {
     if (!content) return null;
 
-    // Clean up content: normalize CRLF
+    const handleLink = () => {
+      linkClickRef.current?.();
+    };
+
     const normalized = content.replace(/\r\n/g, "\n");
     const rawLines = normalized.split("\n");
 
     const blocks: ReactNode[] = [];
     let currentList: { type: "ol" | "ul"; items: { num?: string; text: string }[] } | null = null;
+    let inCodeBlock = false;
+    let codeLang = "";
+    let codeLines: string[] = [];
 
     const flushList = (blockIdx: number) => {
       if (!currentList) return;
@@ -145,11 +201,11 @@ export function FormattedMarkdown({
         blocks.push(
           <ol
             key={`list-${blockIdx}`}
-            className="my-3 space-y-2 pl-5 list-decimal text-foreground/90 text-sm sm:text-base leading-relaxed"
+            className="my-2.5 space-y-1.5 pl-5 list-decimal text-foreground/90 text-sm leading-relaxed"
           >
             {currentList.items.map((item, i) => (
               <li key={`li-${i}`} className="pl-1">
-                {parseInlineFormatting(item.text, onLinkClick, `ol-${blockIdx}-${i}`)}
+                {parseInlineFormatting(item.text, handleLink, `ol-${blockIdx}-${i}`)}
               </li>
             ))}
           </ol>,
@@ -158,11 +214,11 @@ export function FormattedMarkdown({
         blocks.push(
           <ul
             key={`list-${blockIdx}`}
-            className="my-3 space-y-2 pl-5 list-disc text-foreground/90 text-sm sm:text-base leading-relaxed"
+            className="my-2.5 space-y-1.5 pl-5 list-disc text-foreground/90 text-sm leading-relaxed"
           >
             {currentList.items.map((item, i) => (
               <li key={`li-${i}`} className="pl-1">
-                {parseInlineFormatting(item.text, onLinkClick, `ul-${blockIdx}-${i}`)}
+                {parseInlineFormatting(item.text, handleLink, `ul-${blockIdx}-${i}`)}
               </li>
             ))}
           </ul>,
@@ -174,34 +230,60 @@ export function FormattedMarkdown({
     let blockCounter = 0;
 
     for (let i = 0; i < rawLines.length; i++) {
-      const line = rawLines[i].trimEnd();
+      const line = rawLines[i];
 
-      // Check for horizontal dividers: --- or ***
-      if (/^(\s*[-*_]\s*){3,}$/.test(line)) {
-        flushList(blockCounter++);
-        blocks.push(<hr key={`hr-${blockCounter++}`} className="my-4 border-t border-border/70" />);
+      // Fenced code blocks: ```lang
+      if (line.trimStart().startsWith("```")) {
+        if (!inCodeBlock) {
+          flushList(blockCounter++);
+          inCodeBlock = true;
+          codeLang = line.trimStart().slice(3).trim();
+          codeLines = [];
+        } else {
+          inCodeBlock = false;
+          blocks.push(
+            <CodeBlockView
+              key={`code-${blockCounter++}`}
+              lang={codeLang}
+              code={codeLines.join("\n")}
+            />,
+          );
+          codeLang = "";
+          codeLines = [];
+        }
         continue;
       }
 
-      // Check for Headings: #, ##, ###, ####, #####
-      const headingMatch = line.match(/^(#{1,6})\s+(.*)$/);
+      if (inCodeBlock) {
+        codeLines.push(line);
+        continue;
+      }
+
+      const trimmedEnd = line.trimEnd();
+
+      // Safe O(1) horizontal divider check
+      if (isHorizontalRule(trimmedEnd)) {
+        flushList(blockCounter++);
+        blocks.push(<hr key={`hr-${blockCounter++}`} className="my-3 border-t border-border/70" />);
+        continue;
+      }
+
+      // Headings: #, ##, ###
+      const headingMatch = trimmedEnd.match(/^(#{1,6})\s+(.*)$/);
       if (headingMatch) {
         flushList(blockCounter++);
         const level = headingMatch[1].length;
         let rawTitle = headingMatch[2].trim();
-
-        // Strip leading/trailing bold markers if the entire heading was wrapped in **title**
         if (rawTitle.startsWith("**") && rawTitle.endsWith("**") && rawTitle.length > 4) {
           rawTitle = rawTitle.slice(2, -2).trim();
         }
-
-        const titleNodes = parseInlineFormatting(rawTitle, onLinkClick, `h-${blockCounter}`);
+        const titleNodes = parseInlineFormatting(rawTitle, handleLink, `h-${blockCounter}`);
 
         if (level === 1) {
           blocks.push(
             <h1
               key={`h1-${blockCounter++}`}
-              className="mt-5 mb-2.5 text-xl sm:text-2xl font-black tracking-tight text-foreground border-b border-border/60 pb-2"
+              className="mt-4 mb-2 text-lg sm:text-xl font-black tracking-tight text-foreground border-b border-border/60 pb-1.5"
             >
               {titleNodes}
             </h1>,
@@ -210,19 +292,18 @@ export function FormattedMarkdown({
           blocks.push(
             <h2
               key={`h2-${blockCounter++}`}
-              className="mt-4 mb-2 text-lg sm:text-xl font-extrabold tracking-tight text-foreground"
+              className="mt-3.5 mb-1.5 text-base sm:text-lg font-extrabold tracking-tight text-foreground"
             >
               {titleNodes}
             </h2>,
           );
         } else {
-          // Level 3, 4, 5, 6
           blocks.push(
             <h3
               key={`h3-${blockCounter++}`}
-              className="mt-3.5 mb-1.5 text-base sm:text-lg font-bold tracking-tight text-foreground flex items-center gap-1.5"
+              className="mt-3 mb-1 text-sm sm:text-base font-bold tracking-tight text-foreground flex items-center gap-1.5"
             >
-              <span className="inline-block w-1.5 h-4 bg-primary rounded-full flex-shrink-0" />
+              <span className="inline-block w-1.5 h-3.5 bg-primary rounded-full shrink-0" />
               <span>{titleNodes}</span>
             </h3>,
           );
@@ -230,8 +311,8 @@ export function FormattedMarkdown({
         continue;
       }
 
-      // Check for Numbered List: 1. Item or 1) Item
-      const olMatch = line.match(/^(\d+)[.)]\s+(.*)$/);
+      // Numbered list: 1. Item
+      const olMatch = trimmedEnd.match(/^\s*(\d+)[.)]\s+(.*)$/);
       if (olMatch) {
         if (!currentList || currentList.type !== "ol") {
           flushList(blockCounter++);
@@ -241,8 +322,8 @@ export function FormattedMarkdown({
         continue;
       }
 
-      // Check for Bullet List: - Item or * Item (with space)
-      const ulMatch = line.match(/^[-*•]\s+(.*)$/);
+      // Bullet list: - Item or * Item
+      const ulMatch = trimmedEnd.match(/^\s*[-*•]\s+(.*)$/);
       if (ulMatch) {
         if (!currentList || currentList.type !== "ul") {
           flushList(blockCounter++);
@@ -252,50 +333,56 @@ export function FormattedMarkdown({
         continue;
       }
 
-      // Check for Blockquote: > text
-      const quoteMatch = line.match(/^>\s*(.*)$/);
+      // Blockquote: > text
+      const quoteMatch = trimmedEnd.match(/^>\s*(.*)$/);
       if (quoteMatch) {
         flushList(blockCounter++);
         blocks.push(
           <blockquote
             key={`quote-${blockCounter++}`}
-            className="my-2.5 pl-4 py-1.5 border-l-4 border-primary/70 bg-muted/40 rounded-r-xl text-foreground/90 italic text-sm sm:text-base"
+            className="my-2 pl-3.5 py-1.5 border-l-4 border-primary/70 bg-muted/40 rounded-r-xl text-foreground/90 italic text-xs sm:text-sm"
           >
-            {parseInlineFormatting(quoteMatch[1], onLinkClick, `quote-${blockCounter}`)}
+            {parseInlineFormatting(quoteMatch[1], handleLink, `quote-${blockCounter}`)}
           </blockquote>,
         );
         continue;
       }
 
-      // Empty line
-      if (line.trim() === "") {
+      if (trimmedEnd.trim() === "") {
         flushList(blockCounter++);
-        // Add subtle paragraph gap
         continue;
       }
 
-      // Standard paragraph line
       flushList(blockCounter++);
       blocks.push(
         <p
           key={`p-${blockCounter++}`}
-          className="my-2 text-sm sm:text-base leading-relaxed text-foreground/90 break-words"
+          className="my-1.5 text-sm leading-relaxed text-foreground/90 break-words"
         >
-          {parseInlineFormatting(line, onLinkClick, `p-line-${blockCounter}`)}
+          {parseInlineFormatting(trimmedEnd, handleLink, `p-${blockCounter}`)}
         </p>,
       );
     }
 
-    flushList(blockCounter++);
+    if (inCodeBlock && codeLines.length > 0) {
+      blocks.push(
+        <CodeBlockView
+          key={`code-end-${blockCounter++}`}
+          lang={codeLang}
+          code={codeLines.join("\n")}
+        />,
+      );
+    }
 
+    flushList(blockCounter++);
     return blocks;
-  }, [content, onLinkClick]);
+  }, [content]);
 
   return (
     <div
-      className={`formatted-content space-y-1 font-sans text-foreground select-text ${className}`}
+      className={`formatted-content space-y-1 font-sans text-foreground select-text overflow-hidden ${className}`}
     >
       {renderedBlocks}
     </div>
   );
-}
+});

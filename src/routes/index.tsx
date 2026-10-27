@@ -13,12 +13,14 @@ import {
   Wallet,
   Workflow,
   ChevronRight,
+  Wand2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Reveal } from "@/components/site/reveal";
 import { CategoryIcon, ToolCard, ToolCardSkeleton } from "@/components/site/tool-card";
 import { LiveToolCard } from "@/components/tools/live-tool-card";
+import { HomepageReviewsSection } from "@/components/tools/tool-reviews";
 import { LIVE_TOOLS } from "@/lib/phase1-tools";
 import { COMPLETE_TOOLS, getToolBySlug, type CompleteTool } from "@/lib/complete-tools";
 import {
@@ -495,7 +497,7 @@ function Home() {
               search={{ page: 1 }}
               className="group inline-flex items-center gap-2 text-sm font-semibold text-primary"
             >
-              View all 96 tools
+              View all 100 tools
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
@@ -513,6 +515,98 @@ function Home() {
                 </Reveal>
               ))}
         </div>
+      </section>
+
+      {/* AI Creative & Productivity Studio Spotlight */}
+      <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+        <Reveal>
+          <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-10 shadow-soft">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+              <div>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 border border-primary/30 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-primary">
+                  <Wand2 className="size-3.5" /> New Flagship AI Suite
+                </span>
+                <h2 className="mt-2.5 text-2xl font-extrabold sm:text-3xl text-foreground">
+                  AI Image Generation, Summarizer, Code &amp; Writing Studio
+                </h2>
+                <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground sm:text-base">
+                  Create high-resolution 4K AI art, summarize research in English/Marathi/Hindi,
+                  generate production code, and draft high-converting emails—all in one place.
+                </p>
+              </div>
+              <Link
+                to="/tools/ai-image-generator"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3.5 text-xs sm:text-sm font-extrabold text-primary-foreground shadow-md hover:bg-primary/90 transition-all shrink-0"
+              >
+                <Sparkles className="size-4 text-amber-300" />
+                Launch AI Image Studio →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                {
+                  slug: "ai-image-generator",
+                  title: "AI Image Generator",
+                  badge: "🎨 8 Art Styles",
+                  desc: "Text-to-image studio with 1:1, 16:9, 9:16 ratios, prompt enhancer & color grading.",
+                  img: "/assets/tools/ai-image-generator.png",
+                },
+                {
+                  slug: "ai-summarizer",
+                  title: "AI Summarizer & Paraphraser",
+                  badge: "⚡ TL;DR & Notes",
+                  desc: "Condense long articles into executive bullets in English, मराठी, & हिंदी.",
+                  img: "/assets/tools/ai-summarizer.png",
+                },
+                {
+                  slug: "ai-code-assistant",
+                  title: "AI Code Generator",
+                  badge: "💻 Dev Copilot",
+                  desc: "Generate, debug, and explain TypeScript, Python, React, and SQL queries.",
+                  img: "/assets/tools/ai-code-assistant.png",
+                },
+                {
+                  slug: "ai-email-writer",
+                  title: "AI Email & Letter Pro",
+                  badge: "✉️ Outreach",
+                  desc: "Draft polished cold emails, client proposals, and job cover letters.",
+                  img: "/assets/tools/ai-email-writer.png",
+                },
+              ].map((item) => (
+                <Link
+                  key={item.slug}
+                  to={`/tools/${item.slug}`}
+                  className="group flex flex-col justify-between rounded-2xl border border-border bg-card/90 p-4 shadow-soft transition-all hover:-translate-y-1 hover:border-primary/50"
+                >
+                  <div>
+                    <div className="aspect-[16/10] w-full overflow-hidden rounded-xl border border-border bg-muted mb-3">
+                      <img
+                        src={item.img}
+                        alt={item.title}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                    <span className="inline-block rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary mb-1.5">
+                      {item.badge}
+                    </span>
+                    <h3 className="text-sm font-extrabold text-foreground group-hover:text-primary transition-colors">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                  <div className="mt-3 pt-2.5 border-t border-border/60 flex items-center justify-between text-xs font-bold text-primary">
+                    <span>Open Studio</span>
+                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </Reveal>
       </section>
 
       {/* Categories Grid */}
@@ -554,6 +648,9 @@ function Home() {
         </div>
       </section>
 
+      {/* Verified Community Reviews & Ratings Section */}
+      <HomepageReviewsSection />
+
       {/* Trust / value */}
       <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         <Reveal>
@@ -584,14 +681,14 @@ function Home() {
               The whole toolbox is one tap away
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-sm text-muted-foreground sm:text-base">
-              Search the full directory of 96 tools, filter by category, or press ⌘K from anywhere.
+              Search the full directory of 100 tools, filter by category, or press ⌘K from anywhere.
             </p>
             <Link
               to="/tools"
               search={{ page: 1 }}
               className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-lift active:scale-95"
             >
-              Explore All 96 Tools <ArrowRight className="size-4" />
+              Explore All 100 Tools <ArrowRight className="size-4" />
             </Link>
           </div>
         </Reveal>

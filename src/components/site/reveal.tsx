@@ -12,8 +12,19 @@ export function Reveal({ children, delay = 0, className = "", as = "div" }: Reve
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
+    if (shown) return;
     const node = ref.current;
     if (!node) return;
+
+    if (
+      typeof window === "undefined" ||
+      window.innerWidth < 768 ||
+      typeof IntersectionObserver === "undefined"
+    ) {
+      setShown(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -23,18 +34,18 @@ export function Reveal({ children, delay = 0, className = "", as = "div" }: Reve
           }
         }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+      { threshold: 0.02, rootMargin: "20px 0px 0px 0px" },
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [shown]);
 
   const Tag = as as "div";
 
   return (
     <Tag
       ref={ref as never}
-      style={{ transitionDelay: `${delay}ms` }}
+      style={delay && !shown ? { transitionDelay: `${delay}ms` } : undefined}
       className={`reveal ${shown ? "reveal-in" : ""} ${className}`}
     >
       {children}

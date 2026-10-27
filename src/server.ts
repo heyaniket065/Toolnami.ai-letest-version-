@@ -2,7 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-import { handleAssistantChat } from "./lib/gemini-server";
+import { handleAssistantChat, handleGenerateImage } from "./lib/gemini-server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -53,9 +53,10 @@ export default {
         try {
           const body = (await request.json()) as {
             messages?: { role: "user" | "assistant"; content: string }[];
+            contextPath?: string;
           };
           const messages = body.messages || [];
-          const result = await handleAssistantChat(messages);
+          const result = await handleAssistantChat(messages, body.contextPath);
           return new Response(JSON.stringify(result), {
             status: 200,
             headers: { "content-type": "application/json; charset=utf-8" },
@@ -63,6 +64,39 @@ export default {
         } catch (apiErr) {
           console.error("API /api/chat error:", apiErr);
           return new Response(JSON.stringify({ error: "Failed to process chat message" }), {
+            status: 500,
+            headers: { "content-type": "application/json; charset=utf-8" },
+          });
+        }
+      }
+
+      if (url.pathname === "/api/generate-image" && request.method === "POST") {
+        try {
+          const body = (await request.json()) as {
+            prompt?: string;
+            negativePrompt?: string;
+            style?: string;
+            styleDescriptor?: string;
+            aspectRatio?: string;
+            lighting?: string;
+            seed?: number;
+          };
+          const result = await handleGenerateImage({
+            prompt: body.prompt || "Futuristic neon concept art",
+            negativePrompt: body.negativePrompt,
+            style: body.style,
+            styleDescriptor: body.styleDescriptor,
+            aspectRatio: body.aspectRatio,
+            lighting: body.lighting,
+            seed: body.seed,
+          });
+          return new Response(JSON.stringify(result), {
+            status: 200,
+            headers: { "content-type": "application/json; charset=utf-8" },
+          });
+        } catch (imgErr) {
+          console.error("API /api/generate-image error:", imgErr);
+          return new Response(JSON.stringify({ error: "Failed to generate image" }), {
             status: 500,
             headers: { "content-type": "application/json; charset=utf-8" },
           });

@@ -1,7 +1,3 @@
-const fs = require("fs");
-const path = require("path");
+// Nitro serverEntry auto-detection is disabled via `serverEntry: false` in vite.config.ts,
+// so server.ts remains in place throughout the build lifecycle.
 
-const serverTs = path.join(__dirname, "..", "server.ts");
-if (fs.existsSync(serverTs)) {
-  fs.unlinkSync(serverTs);
-}

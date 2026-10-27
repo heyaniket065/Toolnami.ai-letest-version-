@@ -1,8 +1,8 @@
-import imageCompressorImg from "@/assets/tools/3d-image-compressor.png";
-import jpgToPdfImg from "@/assets/tools/3d-jpg-to-pdf.png";
-import pdfCompressorImg from "@/assets/tools/3d-pdf-compressor.png";
-import pdfMergeImg from "@/assets/tools/3d-pdf-merge.png";
-import qrCodeImg from "@/assets/tools/3d-qr-code-generator.png";
+const imageCompressorImg = "/assets/tools/3d-image-compressor.png";
+const jpgToPdfImg = "/assets/tools/3d-jpg-to-pdf.png";
+const pdfCompressorImg = "/assets/tools/3d-pdf-compressor.png";
+const pdfMergeImg = "/assets/tools/3d-pdf-merge.png";
+const qrCodeImg = "/assets/tools/3d-qr-code-generator.png";
 
 export type LiveToolSlug =
   "pdf-compressor" | "pdf-merge" | "image-compressor" | "jpg-to-pdf" | "qr-code-generator";

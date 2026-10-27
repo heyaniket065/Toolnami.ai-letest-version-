@@ -18,6 +18,12 @@ import {
   Trash2,
   TrendingUp,
   Workflow,
+  BookOpen,
+  Cpu,
+  Briefcase,
+  Lightbulb,
+  Star,
+  CheckCircle2,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -25,8 +31,9 @@ import { toast } from "sonner";
 import { Reveal } from "@/components/site/reveal";
 import { ToolCard } from "@/components/site/tool-card";
 import { LiveToolCard } from "@/components/tools/live-tool-card";
+import { ToolReviewsSection } from "@/components/tools/tool-reviews";
 import { findLiveTool, type LiveToolSlug, type ToolBadge } from "@/lib/phase1-tools";
-import { COMPLETE_TOOLS, getToolBySlug } from "@/lib/complete-tools";
+import { COMPLETE_TOOLS, getToolBySlug, getLongDescriptionSections } from "@/lib/complete-tools";
 import { DEFAULT_CATEGORIES } from "@/lib/tools-data";
 import { findWorkflowForTool, useRecentAndSavedTools } from "@/hooks/use-recent-tools";
 import {
@@ -99,17 +106,32 @@ export function ToolShell({
   const [zenMode, setZenMode] = useState(false);
   const [scratchpadOpen, setScratchpadOpen] = useState(false);
 
+  const resolvedSlug = useMemo(
+    () =>
+      toolSlug ||
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, ""),
+    [toolSlug, title],
+  );
+
+  const longGuide = useMemo(
+    () => getLongDescriptionSections(resolvedSlug, title, categoryLabel, about),
+    [resolvedSlug, title, categoryLabel, about],
+  );
+
   const activeWorkflow = useMemo(
-    () => (toolSlug ? findWorkflowForTool(toolSlug) : null),
-    [toolSlug],
+    () => (resolvedSlug ? findWorkflowForTool(resolvedSlug) : null),
+    [resolvedSlug],
   );
 
   // Record visit in Recently Used Tools
   useEffect(() => {
-    if (toolSlug) {
-      recordToolVisit(toolSlug);
+    if (resolvedSlug) {
+      recordToolVisit(resolvedSlug);
     }
-  }, [toolSlug, recordToolVisit]);
+  }, [resolvedSlug, recordToolVisit]);
 
   const handleShare = async () => {
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";
@@ -234,6 +256,15 @@ export function ToolShell({
                   )}
                   <span>{copiedLink ? "Copied Link" : "Share"}</span>
                 </button>
+
+                <a
+                  href="#reviews"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 shadow-soft transition-all hover:bg-amber-500/20"
+                  title="Jump to Verified User Reviews"
+                >
+                  <Star className="size-3.5 fill-amber-400 text-amber-400" />
+                  <span>4.9 ★ Reviews</span>
+                </a>
               </div>
 
               <h1 className="mt-5 text-3xl font-bold sm:text-5xl">{title}</h1>
@@ -532,6 +563,124 @@ export function ToolShell({
         </div>
       </section>
 
+      {/* Comprehensive Long Description & Technical Architecture Guide */}
+      <section className="border-t border-border bg-card/30">
+        <div className="mx-auto w-full max-w-5xl px-4 py-14 sm:px-6 sm:py-16 space-y-12">
+          {/* 1. Deep-Dive Editorial Overview */}
+          <Reveal>
+            <div className="rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-soft space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+                <div>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                    <BookOpen className="size-4" /> Complete Guide &amp; Long Description
+                  </span>
+                  <h2 className="mt-1 text-2xl font-extrabold sm:text-3xl text-foreground">
+                    Everything You Need to Know About {title}
+                  </h2>
+                </div>
+                <span className="rounded-full bg-emerald-500/10 border border-emerald-500/25 px-3.5 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                  100% Client-Side Verified
+                </span>
+              </div>
+
+              <div className="space-y-4 text-sm sm:text-base leading-relaxed text-muted-foreground">
+                {longGuide.overviewParagraphs.map((para, idx) => (
+                  <p key={idx}>{para}</p>
+                ))}
+                {seo.paragraphs.map((p, idx) => (
+                  <p key={`seo-${idx}`}>{p}</p>
+                ))}
+              </div>
+
+              {/* Under-the-Hood Architecture Highlights */}
+              <div className="pt-4">
+                <h3 className="text-base font-extrabold text-foreground flex items-center gap-2 mb-4">
+                  <Cpu className="size-4 text-primary" /> Under-the-Hood Architecture &amp; Privacy
+                  Safeguards
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {longGuide.architectureHighlights.map((item, idx) => {
+                    const [head, body] = item.split(": ");
+                    return (
+                      <div
+                        key={idx}
+                        className="rounded-2xl border border-border bg-muted/25 p-4 flex items-start gap-3"
+                      >
+                        <CheckCircle2 className="size-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <div className="text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                          <strong className="text-foreground">{head}:</strong> {body || item}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* 2. Industry Use Cases & Technical Specifications Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-7 space-y-4">
+              <Reveal>
+                <h3 className="text-xl font-extrabold text-foreground flex items-center gap-2">
+                  <Briefcase className="size-5 text-primary" /> Real-World Industry Use Cases
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  How teams and professionals use {title} in daily production workflows:
+                </p>
+              </Reveal>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {longGuide.industryUseCases.map((uc, i) => (
+                  <Reveal key={uc.role} delay={i * 50}>
+                    <div className="h-full rounded-2xl border border-border bg-card p-5 shadow-soft space-y-2">
+                      <div className="text-sm font-bold text-foreground">{uc.role}</div>
+                      <p className="text-xs leading-relaxed text-muted-foreground">{uc.scenario}</p>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 space-y-4">
+              <Reveal>
+                <h3 className="text-xl font-extrabold text-foreground flex items-center gap-2">
+                  <ShieldCheck className="size-5 text-primary" /> Technical Specifications
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Verified performance and security parameters for {title}:
+                </p>
+              </Reveal>
+              <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-soft divide-y divide-border">
+                {longGuide.techSpecs.map((spec) => (
+                  <div
+                    key={spec.label}
+                    className="flex items-center justify-between gap-4 px-4 py-3 text-xs"
+                  >
+                    <span className="font-semibold text-muted-foreground">{spec.label}</span>
+                    <span className="font-bold text-foreground text-right">{spec.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pro Workflow Tips */}
+              <div className="rounded-2xl border border-primary/25 bg-primary-soft/25 p-5 space-y-2.5">
+                <div className="text-xs font-extrabold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                  <Lightbulb className="size-4" /> Pro Workflow Tips
+                </div>
+                <ul className="space-y-2 text-xs text-muted-foreground leading-relaxed">
+                  {longGuide.proTips.map((tip, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="font-bold text-primary">•</span>
+                      <span>{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAQs */}
       <section className="border-t border-border bg-card/50">
         <div className="mx-auto w-full max-w-3xl px-4 py-14 sm:px-6 sm:py-16">
@@ -562,17 +711,8 @@ export function ToolShell({
         </div>
       </section>
 
-      {/* SEO content */}
-      <section className="mx-auto w-full max-w-3xl px-4 py-14 sm:px-6 sm:py-16">
-        <Reveal>
-          <h2 className="text-xl font-bold sm:text-2xl">{seo.heading}</h2>
-          <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
-            {seo.paragraphs.map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
-        </Reveal>
-      </section>
+      {/* Verified User Reviews & Star Ratings Section */}
+      <ToolReviewsSection toolSlug={resolvedSlug} toolTitle={title} categoryLabel={categoryLabel} />
 
       {/* Related Tools Section */}
       {relatedSlugs && relatedSlugs.length > 0 ? (

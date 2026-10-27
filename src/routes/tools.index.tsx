@@ -29,15 +29,29 @@ import {
 } from "@/lib/tools-data";
 import { useRecentAndSavedTools } from "@/hooks/use-recent-tools";
 
-type ToolsSearch = { q?: string | undefined; category?: string | undefined; page: number };
+type ToolsSearch = {
+  q?: string | undefined;
+  category?: string | undefined;
+  cat?: string | undefined;
+  saved?: boolean | undefined;
+  page: number;
+};
 
 export const Route = createFileRoute("/tools/")({
-  validateSearch: (search: Record<string, unknown>): ToolsSearch => ({
-    q: typeof search["q"] === "string" && search["q"] ? search["q"] : undefined,
-    category:
-      typeof search["category"] === "string" && search["category"] ? search["category"] : undefined,
-    page: Math.max(1, Number(search["page"]) || 1),
-  }),
+  validateSearch: (search: Record<string, unknown>): ToolsSearch => {
+    const rawCat =
+      typeof search["category"] === "string" && search["category"]
+        ? search["category"]
+        : typeof search["cat"] === "string" && search["cat"]
+          ? search["cat"]
+          : undefined;
+    return {
+      q: typeof search["q"] === "string" && search["q"] ? search["q"] : undefined,
+      category: rawCat,
+      saved: search["saved"] === true || search["saved"] === "true" ? true : undefined,
+      page: Math.max(1, Number(search["page"]) || 1),
+    };
+  },
   head: () => ({
     meta: [
       { title: "All 96 Online Tools Directory — ToolNami" },
@@ -75,12 +89,12 @@ export const Route = createFileRoute("/tools/")({
 });
 
 function ToolsPage() {
-  const { q, category, page } = Route.useSearch();
+  const { q, category, saved, page } = Route.useSearch();
   const navigate = useNavigate({ from: "/tools" });
   const [term, setTerm] = useState(q ?? "");
   const [sortBy, setSortBy] = useState<ToolSortOption>("featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [onlySaved, setOnlySaved] = useState(false);
+  const [onlySaved, setOnlySaved] = useState(Boolean(saved));
 
   const { savedSlugs, isToolSaved, toggleToolSaved } = useRecentAndSavedTools();
 
@@ -88,8 +102,16 @@ function ToolsPage() {
     setTerm(q ?? "");
   }, [q]);
 
+  useEffect(() => {
+    if (saved !== undefined) {
+      setOnlySaved(Boolean(saved));
+    }
+  }, [saved]);
+
   const { data: categories = [] } = useQuery(categoriesQuery);
-  const activeCategory = categories.find((c: ToolCategory) => c.slug === category);
+  const activeCategory = categories.find(
+    (c: ToolCategory) => c.slug === category || c.id === category,
+  );
 
   const { data, isPending, isError } = useQuery(
     toolsPageQuery({

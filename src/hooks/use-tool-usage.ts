@@ -87,9 +87,10 @@ export function useToolUsage(
     }
   }, [toolSlug]);
 
-  // Handle live active growth
+  // Handle live active growth (desktop only to keep mobile battery & CPU 100% idle during scroll/typing)
   useEffect(() => {
     if (!enableLiveGrowth) return;
+    if (typeof window !== "undefined" && window.innerWidth < 768) return;
 
     let timer: NodeJS.Timeout;
 

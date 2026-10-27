@@ -12,29 +12,36 @@ interface UrlEntry {
 
 export function SitemapGeneratorTool() {
   const [domain, setDomain] = useState("https://example.com");
+  const [defaultDate, setDefaultDate] = useState("2026-01-01");
   const [urls, setUrls] = useState<UrlEntry[]>([
     {
       url: "/",
       changefreq: "daily",
       priority: "1.0",
-      lastmod: new Date().toISOString().split("T")[0],
+      lastmod: "2026-01-01",
     },
     {
       url: "/about",
       changefreq: "monthly",
       priority: "0.8",
-      lastmod: new Date().toISOString().split("T")[0],
+      lastmod: "2026-01-01",
     },
     {
       url: "/contact",
       changefreq: "monthly",
       priority: "0.5",
-      lastmod: new Date().toISOString().split("T")[0],
+      lastmod: "2026-01-01",
     },
   ]);
   const [bulkInput, setBulkInput] = useState("");
   const [isBulkMode, setIsBulkMode] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  React.useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    setDefaultDate(today);
+    setUrls((prev) => prev.map((u) => (u.lastmod === "2026-01-01" ? { ...u, lastmod: today } : u)));
+  }, []);
 
   const cleanDomain = domain.trim().replace(/\/+$/, "");
 
@@ -50,7 +57,7 @@ export function SitemapGeneratorTool() {
               : `${cleanDomain}${path.startsWith("/") ? "" : "/"}${path}`,
             changefreq: "weekly",
             priority: "0.8",
-            lastmod: new Date().toISOString().split("T")[0],
+            lastmod: defaultDate,
           }))
       : urls.map((u) => ({
           url: u.url.startsWith("http")
@@ -72,7 +79,7 @@ export function SitemapGeneratorTool() {
     ];
 
     return lines.join("\n");
-  }, [cleanDomain, urls, bulkInput, isBulkMode]);
+  }, [cleanDomain, urls, bulkInput, isBulkMode, defaultDate]);
 
   const addUrl = () => {
     setUrls([
