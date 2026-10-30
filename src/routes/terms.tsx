@@ -17,7 +17,7 @@ export const Route = createFileRoute("/terms")({
       },
       { property: "og:site_name", content: "ToolNami" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://toolnami.com/terms" },
+      { property: "og:url", content: "https://toolnami.ai.studio/terms" },
       { property: "og:title", content: "Terms & Conditions — ToolNami" },
       {
         property: "og:description",
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/terms")({
       },
       { name: "twitter:image", content: "/assets/tools/3d-pdf-compressor.png" },
     ],
-    links: [{ rel: "canonical", href: "https://toolnami.com/terms" }],
+    links: [{ rel: "canonical", href: "https://toolnami.ai.studio/terms" }],
   }),
   component: () => (
     <LegalPage

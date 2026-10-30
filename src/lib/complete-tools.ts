@@ -1,3 +1,5 @@
+import { buildEnrichedKeywords } from "./tool-seo-keywords";
+
 export type ToolCategory =
   "pdf" | "image" | "text" | "developer" | "seo" | "calculator" | "utility" | "ai";
 
@@ -3577,9 +3579,10 @@ export const COMPLETE_TOOLS: CompleteTool[] = [
   },
 ];
 
-// Quick index and lookup maps
+// Enrich keywords for every tool and build quick lookup map
 const toolBySlugMap = new Map<string, CompleteTool>();
 COMPLETE_TOOLS.forEach((t) => {
+  t.keywords = buildEnrichedKeywords(t);
   toolBySlugMap.set(t.slug, t);
 });
 
@@ -3653,20 +3656,82 @@ export function getToolsByCategory(category: ToolCategory): CompleteTool[] {
   return COMPLETE_TOOLS.filter((t) => t.category === category);
 }
 
+export function scoreToolSearchMatch(tool: CompleteTool, rawQuery: string): number {
+  const cleanQuery = rawQuery.toLowerCase().trim();
+  if (!cleanQuery) return 1;
+
+  const titleLower = tool.title.toLowerCase();
+  const slugLower = tool.slug.toLowerCase();
+  const slugWords = slugLower.replace(/-/g, " ");
+  const summaryLower = tool.summary.toLowerCase();
+  const techLower = (tool.technicalDescription || "").toLowerCase();
+  const catLower = tool.categoryLabel.toLowerCase();
+  const keywordsLower = tool.keywords.map((k) => k.toLowerCase());
+
+  let score = 0;
+
+  if (titleLower === cleanQuery || slugLower === cleanQuery || slugWords === cleanQuery) {
+    score += 120;
+  } else if (titleLower.startsWith(cleanQuery) || slugWords.startsWith(cleanQuery)) {
+    score += 90;
+  } else if (titleLower.includes(cleanQuery) || slugWords.includes(cleanQuery)) {
+    score += 75;
+  }
+
+  if (keywordsLower.some((k) => k === cleanQuery)) {
+    score += 85;
+  } else if (keywordsLower.some((k) => k.includes(cleanQuery))) {
+    score += 60;
+  }
+
+  if (summaryLower.includes(cleanQuery)) {
+    score += 35;
+  }
+  if (catLower.includes(cleanQuery)) {
+    score += 25;
+  }
+
+  // Multi-word token matching so queries like "pdf size 100kb" or "remove photo bg" always match
+  const tokens = cleanQuery.split(/\s+/).filter((t) => t.length > 1);
+  if (tokens.length > 0) {
+    const searchableHaystack = [
+      titleLower,
+      slugWords,
+      summaryLower,
+      techLower,
+      catLower,
+      ...keywordsLower,
+    ].join(" ");
+
+    const matchedTokens = tokens.filter((tok) => searchableHaystack.includes(tok));
+    if (matchedTokens.length === tokens.length) {
+      score += 50 + matchedTokens.length * 10;
+      for (const tok of tokens) {
+        if (titleLower.includes(tok) || slugWords.includes(tok)) score += 15;
+        if (keywordsLower.some((k) => k.includes(tok))) score += 10;
+      }
+    }
+  }
+
+  return score;
+}
+
 export function searchTools(query: string, categoryFilter?: ToolCategory | "all"): CompleteTool[] {
   const cleanQuery = query.toLowerCase().trim();
-  return COMPLETE_TOOLS.filter((tool) => {
+  const candidates = COMPLETE_TOOLS.filter((tool) => {
     if (categoryFilter && categoryFilter !== "all" && tool.category !== categoryFilter) {
       return false;
     }
-    if (!cleanQuery) return true;
-    return (
-      tool.title.toLowerCase().includes(cleanQuery) ||
-      tool.summary.toLowerCase().includes(cleanQuery) ||
-      tool.categoryLabel.toLowerCase().includes(cleanQuery) ||
-      tool.keywords.some((k) => k.toLowerCase().includes(cleanQuery))
-    );
+    return true;
   });
+
+  if (!cleanQuery) return candidates;
+
+  return candidates
+    .map((tool) => ({ tool, score: scoreToolSearchMatch(tool, cleanQuery) }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((item) => item.tool);
 }
 
 export type LongDescriptionGuide = {

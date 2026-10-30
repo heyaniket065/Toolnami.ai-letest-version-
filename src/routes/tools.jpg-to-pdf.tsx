@@ -11,7 +11,7 @@ import { findLiveTool, getDynamicUses } from "@/lib/phase1-tools";
 const TOOL_DATA = findLiveTool("jpg-to-pdf");
 const TITLE = TOOL_DATA.title;
 const DESC = TOOL_DATA.description;
-const URL = "https://toolnami.lovable.app/tools/jpg-to-pdf";
+const URL = "https://toolnami.ai.studio/tools/jpg-to-pdf";
 const FAQS = TOOL_DATA.faqs;
 
 export const Route = createFileRoute("/tools/jpg-to-pdf")({
@@ -19,15 +19,28 @@ export const Route = createFileRoute("/tools/jpg-to-pdf")({
     meta: [
       { title: "JPG to PDF Converter — Free Online Tool | ToolNami" },
       { name: "description", content: DESC },
+      { name: "keywords", content: TOOL_DATA.keywords.join(", ") },
+      {
+        name: "robots",
+        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: URL },
       { property: "og:title", content: "Free JPG to PDF Converter — ToolNami" },
       { property: "og:description", content: DESC },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: URL }],
     scripts: [
       {
         type: "application/ld+json",
-        children: toolJsonLd({ name: TITLE, description: DESC, url: URL, faqs: FAQS }),
+        children: toolJsonLd({
+          name: TITLE,
+          description: DESC,
+          url: URL,
+          faqs: FAQS,
+          keywords: TOOL_DATA.keywords,
+        }),
       },
     ],
   }),

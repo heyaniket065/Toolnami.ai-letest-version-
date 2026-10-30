@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { COMPLETE_TOOLS } from "./complete-tools";
+import { COMPLETE_TOOLS, getToolBySlug, scoreToolSearchMatch } from "./complete-tools";
 
 export type ToolCategory = {
   id: string;
@@ -158,25 +158,34 @@ export function toolsPageQuery(params: {
 
       if (search.trim()) {
         const s = search.trim().toLowerCase();
-        filtered = filtered.filter(
-          (t) =>
-            t.title.toLowerCase().includes(s) ||
-            t.slug.toLowerCase().includes(s) ||
-            (t.description && t.description.toLowerCase().includes(s)),
-        );
-      }
-
-      filtered.sort((a, b) => {
-        if (sort === "popular") {
-          return (b.views || 0) - (a.views || 0);
-        }
-        if (sort === "az") {
+        const scored = filtered
+          .map((t) => {
+            const complete = getToolBySlug(t.slug);
+            const score = complete
+              ? scoreToolSearchMatch(complete, s)
+              : t.title.toLowerCase().includes(s) ||
+                  t.slug.toLowerCase().includes(s) ||
+                  (t.description && t.description.toLowerCase().includes(s))
+                ? 50
+                : 0;
+            return { tool: t, score };
+          })
+          .filter((item) => item.score > 0)
+          .sort((a, b) => b.score - a.score);
+        filtered = scored.map((item) => item.tool);
+      } else {
+        filtered.sort((a, b) => {
+          if (sort === "popular") {
+            return (b.views || 0) - (a.views || 0);
+          }
+          if (sort === "az") {
+            return a.title.localeCompare(b.title);
+          }
+          if (a.featured && !b.featured) return -1;
+          if (!a.featured && b.featured) return 1;
           return a.title.localeCompare(b.title);
-        }
-        if (a.featured && !b.featured) return -1;
-        if (!a.featured && b.featured) return 1;
-        return a.title.localeCompare(b.title);
-      });
+        });
+      }
 
       const total = filtered.length;
       const from = (page - 1) * TOOLS_PER_PAGE;

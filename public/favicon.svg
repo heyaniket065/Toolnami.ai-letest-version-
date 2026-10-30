@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="tn-bg" x1="4" y1="6" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="6" width="54" height="54" rx="18" fill="url(#tn-bg)" />
+  <g transform="translate(13, 15) scale(1.5833)">
+    <path
+      d="M2 16c2.6 0 3.4-3 6-3s3.4 3 6 3 3.4-3 6-3"
+      stroke="#ffffff"
+      stroke-width="2.3"
+      stroke-linecap="round"
+    />
+    <path
+      d="M6 9.5c1.8-4 5.4-5.5 9-4.5"
+      stroke="#ffffff"
+      stroke-width="2.3"
+      stroke-linecap="round"
+    />
+  </g>
+  <circle cx="53" cy="11" r="7.5" fill="#facc15" />
+</svg>

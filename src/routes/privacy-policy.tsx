@@ -17,7 +17,7 @@ export const Route = createFileRoute("/privacy-policy")({
       },
       { property: "og:site_name", content: "ToolNami" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://toolnami.com/privacy-policy" },
+      { property: "og:url", content: "https://toolnami.ai.studio/privacy-policy" },
       { property: "og:title", content: "Privacy Policy — ToolNami" },
       {
         property: "og:description",
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/privacy-policy")({
       },
       { name: "twitter:image", content: "/assets/tools/3d-pdf-compressor.png" },
     ],
-    links: [{ rel: "canonical", href: "https://toolnami.com/privacy-policy" }],
+    links: [{ rel: "canonical", href: "https://toolnami.ai.studio/privacy-policy" }],
   }),
   component: () => (
     <LegalPage

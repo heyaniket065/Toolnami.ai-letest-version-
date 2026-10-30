@@ -91,7 +91,7 @@ export const Route = createFileRoute("/tools/$slug")({
     const tool = loaderData?.tool;
     if (!tool) return { meta: [{ title: "Tool Not Found — ToolNami" }] };
 
-    const toolUrl = `https://toolnami.com/tools/${tool.slug}`;
+    const toolUrl = `https://toolnami.ai.studio/tools/${tool.slug}`;
 
     return {
       meta: [
@@ -124,6 +124,7 @@ export const Route = createFileRoute("/tools/$slug")({
             description: tool.technicalDescription || tool.summary,
             url: toolUrl,
             faqs: tool.faqs,
+            keywords: tool.keywords,
           }),
         },
       ],

@@ -42,12 +42,17 @@ export const Route = createFileRoute("/")({
           "ToolNami is a clean, fast platform of 96+ free online tools: merge PDFs, compress images, convert units, format code, and more — no installs, no clutter.",
       },
       {
+        name: "keywords",
+        content:
+          "toolnami, free online tools, pdf compressor online, merge pdf free, image compressor, photo size reducer in kb, jpg to pdf, word to pdf, qr code generator, json formatter, emi calculator, gst calculator, ai writer, ai image generator",
+      },
+      {
         name: "robots",
         content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
       },
       { property: "og:site_name", content: "ToolNami" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://toolnami.com/" },
+      { property: "og:url", content: "https://toolnami.ai.studio/" },
       { property: "og:title", content: "ToolNami — Fast, Free Online Tools for Everyday Work" },
       {
         property: "og:description",
@@ -66,7 +71,7 @@ export const Route = createFileRoute("/")({
       },
       { name: "twitter:image", content: "/assets/tools/3d-pdf-compressor.png" },
     ],
-    links: [{ rel: "canonical", href: "https://toolnami.com/" }],
+    links: [{ rel: "canonical", href: "https://toolnami.ai.studio/" }],
   }),
   component: Home,
 });

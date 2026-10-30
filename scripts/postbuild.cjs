@@ -21,7 +21,19 @@ if (!fs.existsSync(indexHtmlPath)) {
   <title>ToolNami — Fast, Free Online Tools</title>
   <meta name="description" content="ToolNami is a clean, fast platform of free online tools for everyday work — PDF, image, text, SEO and developer utilities." />
   <meta name="google-adsense-account" content="ca-pub-7693436223439269" />
-  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32x32.png?v=2" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon-192x192.png?v=2" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" sizes="180x180" />
+  <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0G6TS8RDZX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0G6TS8RDZX');
+  </script>
 </head>
 <body>
   <div id="root"></div>

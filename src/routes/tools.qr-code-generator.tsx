@@ -11,7 +11,7 @@ import { findLiveTool, getDynamicUses } from "@/lib/phase1-tools";
 const TOOL_DATA = findLiveTool("qr-code-generator");
 const TITLE = TOOL_DATA.title;
 const DESC = TOOL_DATA.description;
-const URL = "https://toolnami.lovable.app/tools/qr-code-generator";
+const URL = "https://toolnami.ai.studio/tools/qr-code-generator";
 const FAQS = TOOL_DATA.faqs;
 
 export const Route = createFileRoute("/tools/qr-code-generator")({
@@ -19,15 +19,28 @@ export const Route = createFileRoute("/tools/qr-code-generator")({
     meta: [
       { title: "QR Code Generator — Free Custom QR Codes | ToolNami" },
       { name: "description", content: DESC },
+      { name: "keywords", content: TOOL_DATA.keywords.join(", ") },
+      {
+        name: "robots",
+        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: URL },
       { property: "og:title", content: "Free QR Code Generator — ToolNami" },
       { property: "og:description", content: DESC },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: URL }],
     scripts: [
       {
         type: "application/ld+json",
-        children: toolJsonLd({ name: TITLE, description: DESC, url: URL, faqs: FAQS }),
+        children: toolJsonLd({
+          name: TITLE,
+          description: DESC,
+          url: URL,
+          faqs: FAQS,
+          keywords: TOOL_DATA.keywords,
+        }),
       },
     ],
   }),

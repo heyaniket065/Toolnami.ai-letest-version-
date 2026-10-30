@@ -41,7 +41,7 @@ export const Route = createFileRoute("/contact")({
       },
       { property: "og:site_name", content: "ToolNami" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://toolnami.com/contact" },
+      { property: "og:url", content: "https://toolnami.ai.studio/contact" },
       { property: "og:title", content: "Contact ToolNami & LuminaLM — Aniket Bhalerao" },
       {
         property: "og:description",
@@ -60,7 +60,7 @@ export const Route = createFileRoute("/contact")({
       },
       { name: "twitter:image", content: "/assets/tools/3d-pdf-compressor.png" },
     ],
-    links: [{ rel: "canonical", href: "https://toolnami.com/contact" }],
+    links: [{ rel: "canonical", href: "https://toolnami.ai.studio/contact" }],
   }),
   component: ContactPage,
 });

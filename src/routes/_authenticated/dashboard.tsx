@@ -40,9 +40,14 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
         content: "Profile, saved favorites and history for your ToolNami account.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://toolnami.ai.studio/dashboard" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "robots", content: "noindex" },
+      {
+        name: "robots",
+        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
     ],
+    links: [{ rel: "canonical", href: "https://toolnami.ai.studio/dashboard" }],
   }),
   component: DashboardPage,
 });

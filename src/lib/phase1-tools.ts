@@ -1,3 +1,5 @@
+import { buildEnrichedKeywords } from "./tool-seo-keywords";
+
 const imageCompressorImg = "/assets/tools/3d-image-compressor.png";
 const jpgToPdfImg = "/assets/tools/3d-jpg-to-pdf.png";
 const pdfCompressorImg = "/assets/tools/3d-pdf-compressor.png";
@@ -324,6 +326,16 @@ export const LIVE_TOOLS: LiveTool[] = [
     },
   },
 ];
+
+LIVE_TOOLS.forEach((t) => {
+  t.keywords = buildEnrichedKeywords({
+    slug: t.slug,
+    title: t.title,
+    category: t.categoryLabel.toLowerCase(),
+    categoryLabel: t.categoryLabel,
+    keywords: t.keywords,
+  });
+});
 
 export function findLiveTool(slug: LiveToolSlug): LiveTool {
   return LIVE_TOOLS.find((t) => t.slug === slug) ?? LIVE_TOOLS[0]!;

@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header } from "@/components/site/header";
 import { Footer } from "@/components/site/footer";
+import { Helmet } from "@/components/site/helmet";
 import { WelcomeModal } from "@/components/site/welcome-modal";
 import { AiAssistant } from "@/components/ai-assistant";
 import { Toaster } from "@/components/ui/sonner";
@@ -89,6 +90,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "ToolNami is a clean, fast platform of free online tools for everyday work — PDF, image, text, SEO and developer utilities.",
       },
+      {
+        name: "keywords",
+        content:
+          "toolnami, free online tools, pdf compressor, merge pdf, image compressor, jpg to pdf, qr code generator, json formatter, word counter, age calculator, emi calculator, gst calculator, ai content writer, ai image generator, online utilities",
+      },
       { name: "author", content: "Aniket Bhalerao — LuminaLM" },
       {
         name: "robots",
@@ -106,7 +112,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "One bright, uncluttered home for the everyday tools you keep searching for.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://toolnami.com/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Instgram136" },
       { name: "twitter:creator", content: "@Instgram136" },
@@ -120,12 +125,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "google-adsense-account", content: "ca-pub-7693436223439269" },
     ],
     links: [
-      { rel: "canonical", href: "https://toolnami.com/" },
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg?v=2", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon-32x32.png?v=2", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/favicon-192x192.png?v=2", type: "image/png", sizes: "192x192" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=2", sizes: "180x180" },
+      { rel: "shortcut icon", href: "/favicon.ico?v=2", type: "image/x-icon" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -147,8 +155,8 @@ const schemaOrgJsonLd = JSON.stringify({
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://toolnami.com/#website",
-      url: "https://toolnami.com",
+      "@id": "https://toolnami.ai.studio/#website",
+      url: "https://toolnami.ai.studio",
       name: "ToolNami",
       description:
         "Fast, free online tools for everyday work — PDF, image, text, SEO and developer utilities.",
@@ -157,16 +165,16 @@ const schemaOrgJsonLd = JSON.stringify({
         "@type": "SearchAction",
         target: {
           "@type": "EntryPoint",
-          urlTemplate: "https://toolnami.com/tools?q={search_term_string}",
+          urlTemplate: "https://toolnami.ai.studio/tools?q={search_term_string}",
         },
         "query-input": "required name=search_term_string",
       },
     },
     {
       "@type": "WebApplication",
-      "@id": "https://toolnami.com/#app",
+      "@id": "https://toolnami.ai.studio/#app",
       name: "ToolNami Online Tools Suite",
-      url: "https://toolnami.com",
+      url: "https://toolnami.ai.studio",
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "Any (browser-based)",
       description:
@@ -178,14 +186,14 @@ const schemaOrgJsonLd = JSON.stringify({
         priceCurrency: "USD",
       },
       publisher: {
-        "@id": "https://toolnami.com/#organization",
+        "@id": "https://toolnami.ai.studio/#organization",
       },
     },
     {
       "@type": "Organization",
-      "@id": "https://toolnami.com/#organization",
+      "@id": "https://toolnami.ai.studio/#organization",
       name: "ToolNami by LuminaLM",
-      url: "https://toolnami.com",
+      url: "https://toolnami.ai.studio",
       founder: {
         "@type": "Person",
         name: "Aniket Bhalerao",
@@ -208,6 +216,15 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-0G6TS8RDZX" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-0G6TS8RDZX');`,
+          }}
+        />
         <script
           src="https://quge5.com/88/tag.min.js"
           data-zone="302697"
@@ -243,6 +260,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <Helmet />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-lift focus:outline-none focus:ring-2 focus:ring-ring"

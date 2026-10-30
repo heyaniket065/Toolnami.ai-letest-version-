@@ -25,7 +25,7 @@ export const Route = createFileRoute("/auth")({
       },
       { property: "og:site_name", content: "ToolNami" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://toolnami.com/auth" },
+      { property: "og:url", content: "https://toolnami.ai.studio/auth" },
       { property: "og:title", content: "Sign In or Create Your ToolNami Account" },
       {
         property: "og:description",
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/auth")({
       },
       { name: "twitter:image", content: "/assets/tools/3d-pdf-compressor.png" },
     ],
-    links: [{ rel: "canonical", href: "https://toolnami.com/auth" }],
+    links: [{ rel: "canonical", href: "https://toolnami.ai.studio/auth" }],
   }),
   component: AuthPage,
 });

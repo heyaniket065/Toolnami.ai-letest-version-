@@ -61,12 +61,17 @@ export const Route = createFileRoute("/tools/")({
           "Browse the full ToolNami directory of 96+ free online tools: PDF, image, text, SEO, calculators, AI, and developer utilities.",
       },
       {
+        name: "keywords",
+        content:
+          "online tools directory, all free online tools, pdf tools, image tools, developer utilities, seo tools, financial calculators, ai tools, toolnami",
+      },
+      {
         name: "robots",
         content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
       },
       { property: "og:site_name", content: "ToolNami" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://toolnami.com/tools" },
+      { property: "og:url", content: "https://toolnami.ai.studio/tools" },
       { property: "og:title", content: "All 96 Online Tools Directory — ToolNami" },
       {
         property: "og:description",
@@ -83,7 +88,7 @@ export const Route = createFileRoute("/tools/")({
       },
       { name: "twitter:image", content: "/assets/tools/3d-pdf-compressor.png" },
     ],
-    links: [{ rel: "canonical", href: "https://toolnami.com/tools" }],
+    links: [{ rel: "canonical", href: "https://toolnami.ai.studio/tools" }],
   }),
   component: ToolsPage,
 });

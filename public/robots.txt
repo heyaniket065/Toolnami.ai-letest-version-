@@ -16,4 +16,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://toolnami.com/sitemap.xml
+Sitemap: https://toolnami.ai.studio/sitemap.xml
