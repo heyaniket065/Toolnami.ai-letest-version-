@@ -34,6 +34,7 @@ if (!fs.existsSync(indexHtmlPath)) {
     gtag('js', new Date());
     gtag('config', 'G-0G6TS8RDZX');
   </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7693436223439269" crossorigin="anonymous"></script>
 </head>
 <body>
   <div id="root"></div>

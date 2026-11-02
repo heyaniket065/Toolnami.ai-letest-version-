@@ -147,20 +147,15 @@ export function Helmet() {
     upsertMetaTag("name", "twitter:description", seo.description);
     upsertMetaTag("name", "twitter:image", seo.ogImage);
 
-    // Ensure exactly one self-referencing canonical link in document.head
-    const existingCanonicals = Array.from(
-      document.head.querySelectorAll<HTMLLinkElement>('link[rel="canonical"]'),
-    );
-    if (existingCanonicals.length === 0) {
+    // Update canonical link in document.head without detaching React-managed HeadContent nodes
+    const existingCanonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!existingCanonical) {
       const link = document.createElement("link");
       link.setAttribute("rel", "canonical");
       link.setAttribute("href", seo.canonicalUrl);
       document.head.appendChild(link);
-    } else {
-      existingCanonicals[0]!.setAttribute("href", seo.canonicalUrl);
-      for (let i = 1; i < existingCanonicals.length; i++) {
-        existingCanonicals[i]!.remove();
-      }
+    } else if (existingCanonical.getAttribute("href") !== seo.canonicalUrl) {
+      existingCanonical.setAttribute("href", seo.canonicalUrl);
     }
   }, [seo]);
 

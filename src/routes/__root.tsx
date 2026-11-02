@@ -121,7 +121,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "One bright, uncluttered home for the everyday tools you keep searching for.",
       },
       { name: "theme-color", content: "#2563eb" },
-      { name: "monetag", content: "d5857992c198395f1716c47f4c82d222" },
       { name: "google-adsense-account", content: "ca-pub-7693436223439269" },
     ],
     links: [
@@ -214,10 +213,15 @@ const schemaOrgJsonLd = JSON.stringify({
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
+      <head suppressHydrationWarning>
         <HeadContent />
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-0G6TS8RDZX" />
         <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-0G6TS8RDZX"
+          suppressHydrationWarning
+        />
+        <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
@@ -226,25 +230,17 @@ gtag('config', 'G-0G6TS8RDZX');`,
           }}
         />
         <script
-          src="https://quge5.com/88/tag.min.js"
-          data-zone="302697"
           async
-          data-cfasync="false"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7693436223439269"
+          crossOrigin="anonymous"
+          suppressHydrationWarning
         />
+        <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
-          src="https://quge5.com/88/tag.min.js"
-          data-zone="302710"
-          async
-          data-cfasync="false"
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: schemaOrgJsonLd }}
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "(function(s){s.dataset.zone='12135298',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))",
-          }}
-        />
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schemaOrgJsonLd }} />
       </head>
       <body suppressHydrationWarning>
         {children}
@@ -267,9 +263,14 @@ function RootComponent() {
         >
           Skip to main content
         </a>
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-screen flex-col" suppressHydrationWarning>
           <Header />
-          <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="flex-1 outline-none"
+            suppressHydrationWarning
+          >
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
           </main>

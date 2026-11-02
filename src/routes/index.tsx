@@ -678,8 +678,145 @@ function Home() {
         </div>
       </section>
 
+      {/* Comprehensive Editorial Guide & FAQ — High-Value Publisher Content */}
+      <section className="border-t border-border bg-card/30">
+        <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+          <Reveal>
+            <div className="max-w-3xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary-soft px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+                Platform Architecture &amp; Documentation
+              </span>
+              <h2 className="mt-3 text-2xl font-bold sm:text-3xl">
+                How ToolNami Delivers Studio-Grade Web Utilities Without Compromising Your Privacy
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+                Traditional online file converters and document utilities require you to upload
+                sensitive contracts, bank statements, personal photos, and proprietary source code
+                to remote cloud servers. ToolNami is engineered differently: our workspace executes
+                document manipulation, image compression, financial modeling, and cryptographic
+                hashing directly inside your browser&apos;s sandboxed memory.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <Reveal delay={60}>
+              <article className="h-full rounded-2xl border border-border bg-card p-6 shadow-soft">
+                <h3 className="text-base font-bold text-foreground">
+                  1. Client-Side PDF &amp; Document Engineering
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  Whether you are compressing a scanned PDF for an official government portal,
+                  merging multi-page invoices, locking confidential reports with AES encryption, or
+                  converting PDF pages into high-resolution JPG images, ToolNami processes the
+                  binary byte stream locally using HTML5 Canvas and PDF rendering engines. Your
+                  documents never leave your device, eliminating upload wait times and cloud
+                  data-breach risks.
+                </p>
+              </article>
+            </Reveal>
+
+            <Reveal delay={120}>
+              <article className="h-full rounded-2xl border border-border bg-card p-6 shadow-soft">
+                <h3 className="text-base font-bold text-foreground">
+                  2. Lossless &amp; Lossy Image Optimization for Core Web Vitals
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  Modern websites and e-commerce stores rely on fast-loading visual assets to pass
+                  Google Core Web Vitals (LCP and CLS). Our Image Tools suite lets designers and
+                  publishers compress JPEG, PNG, and WebP graphics, resize social media banners to
+                  exact pixel dimensions, strip EXIF camera metadata, and extract brand color
+                  palettes with real-time side-by-side quality previews.
+                </p>
+              </article>
+            </Reveal>
+
+            <Reveal delay={180}>
+              <article className="h-full rounded-2xl border border-border bg-card p-6 shadow-soft">
+                <h3 className="text-base font-bold text-foreground">
+                  3. Precision Financial, Tax &amp; Everyday Calculators
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  From calculating monthly home or vehicle Loan EMIs with principal-versus-interest
+                  amortization breakdowns to computing Indian GST (inclusive and exclusive slabs of
+                  5%, 12%, 18%, and 28%), compound interest growth, and WHO-standard BMI metrics,
+                  each ToolNami calculator pairs instant interactive sliders with transparent
+                  mathematical formulas and step-by-step explanations.
+                </p>
+              </article>
+            </Reveal>
+
+            <Reveal delay={240}>
+              <article className="h-full rounded-2xl border border-border bg-card p-6 shadow-soft">
+                <h3 className="text-base font-bold text-foreground">
+                  4. Developer, SEO &amp; Structured Data Workflows
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  Software engineers and technical SEO specialists use ToolNami to validate and
+                  beautify nested JSON payloads, decode JWT authentication tokens, test regular
+                  expressions, generate cryptographic SHA-256 hashes, and produce compliant
+                  OpenGraph, robots.txt, and XML sitemap configurations without sharing proprietary
+                  API payloads with third-party servers.
+                </p>
+              </article>
+            </Reveal>
+          </div>
+
+          {/* Frequently Asked Questions */}
+          <Reveal delay={280}>
+            <div className="mt-12 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+              <h3 className="text-xl font-bold text-foreground sm:text-2xl">
+                Frequently Asked Questions (FAQ)
+              </h3>
+              <div className="mt-6 grid gap-6 md:grid-cols-2">
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">
+                    Are my uploaded PDFs and images stored on ToolNami servers?
+                  </h4>
+                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                    No. Core PDF, image, text, and developer tools run 100% client-side inside your
+                    web browser. Your files are processed in local device memory and are never
+                    transmitted to or stored on an external server.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">
+                    Do I need to create an account or pay a subscription to use ToolNami?
+                  </h4>
+                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                    Every utility on ToolNami is completely free to use with no watermarks, no daily
+                    download caps, and no mandatory sign-up walls. Optional sign-in is provided only
+                    for users who wish to sync bookmarks across devices.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">
+                    Does every tool include documentation and examples?
+                  </h4>
+                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                    Yes. Every individual utility page features a One-Click Demo preset, a detailed
+                    step-by-step usage guide, technical methodology notes, pro tips, and
+                    tool-specific FAQs so beginners and professionals alike can verify their
+                    results.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">
+                    Can I use ToolNami on mobile phones and tablets?
+                  </h4>
+                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                    Absolutely. ToolNami is built with a responsive, touch-friendly interface that
+                    works seamlessly across Android, iOS, macOS, Windows, and Linux browsers.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* Explore all CTA */}
-      <section className="mx-auto w-full max-w-6xl px-4 pb-6 sm:px-6">
+      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
         <Reveal>
           <div className="surface-hero relative overflow-hidden rounded-3xl border border-border p-8 text-center shadow-soft sm:p-14">
             <h2 className="mx-auto max-w-xl text-2xl font-bold sm:text-4xl">
