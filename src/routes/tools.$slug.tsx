@@ -41,6 +41,7 @@ import { GenericToolStudio } from "@/components/tools/generic-tool-studio";
 import { BackgroundRemoverTool } from "@/components/tools/background-remover-tool";
 import { ImageSizeReducerTool } from "@/components/tools/image-size-reducer-tool";
 import { AiImageGeneratorTool } from "@/components/tools/ai-image-generator-tool";
+import { AutoCastifyTool } from "@/components/tools/autocastify-tool";
 import {
   PdfRotateTool,
   PdfSplitTool,
@@ -161,29 +162,57 @@ function DynamicToolPage() {
       relatedSlugs={["pdf-compressor", "image-compressor", "qr-code-generator"] as LiveToolSlug[]}
       about={tool.technicalDescription}
       steps={tool.howToSteps}
-      benefits={[
-        {
-          title: "100% Client-Side Privacy",
-          body: "Files and data are processed locally on your machine with zero server uploads.",
-        },
-        {
-          title: "No Size or Usage Limits",
-          body: "Use this tool as many times as you need without signup or restrictions.",
-        },
-        {
-          title: "Lightning Fast Execution",
-          body: "Hardware-accelerated processing provides instant real-time results.",
-        },
-      ]}
+      benefits={
+        tool.slug === "autocastify-youtube-automation"
+          ? [
+              {
+                title: "Google Drive → YouTube Auto-Posting",
+                body: "Drop videos into your connected Google Drive folder and let AutoCastify publish them directly to YouTube automatically.",
+              },
+              {
+                title: "AI-Crafted Titles, Descriptions & Tags",
+                body: "Generate high-CTR YouTube titles, SEO-optimized descriptions, and ranking tags tailored to every upload.",
+              },
+              {
+                title: "Hands-Free Creator Workflow",
+                body: "Eliminate repetitive uploading, formatting, and scheduling so you can focus on producing great content.",
+              },
+            ]
+          : [
+              {
+                title: "100% Client-Side Privacy",
+                body: "Files and data are processed locally on your machine with zero server uploads.",
+              },
+              {
+                title: "No Size or Usage Limits",
+                body: "Use this tool as many times as you need without signup or restrictions.",
+              },
+              {
+                title: "Lightning Fast Execution",
+                body: "Hardware-accelerated processing provides instant real-time results.",
+              },
+            ]
+      }
       faqs={tool.faqs}
-      seo={{
-        heading: `About ${tool.title} — Free Online Tool`,
-        paragraphs: [
-          tool.technicalDescription,
-          `ToolNami's ${tool.title} is designed to be 100% private, ultra-fast, and completely free. Unlike legacy web tools that require you to upload confidential data to remote cloud servers, our architecture runs directly within your modern web browser using client-side WebAssembly, JavaScript, and HTML5 APIs.`,
-          `Whether you are a developer, designer, student, accountant, or business professional, this tool streamlines your daily workflow with zero software installations, zero credit card requirements, and zero usage limits.`,
-        ],
-      }}
+      seo={
+        tool.slug === "autocastify-youtube-automation"
+          ? {
+              heading: "About AutoCastify — AI YouTube Automation & Google Drive Auto-Uploader",
+              paragraphs: [
+                tool.technicalDescription,
+                "Managing a growing YouTube channel takes far more than recording videos — creators spend hours crafting clickable titles, writing keyword-rich descriptions, researching SEO tags, and manually uploading files from cloud storage. AutoCastify (https://autocastify.ai.studio) brings all of those tasks together into one streamlined automation studio.",
+                "Simply organize your finished videos or YouTube Shorts in a Google Drive folder, let AutoCastify generate search-friendly titles, descriptions, and metadata automatically, and publish straight to YouTube without manual downloads or tedious copy-pasting.",
+              ],
+            }
+          : {
+              heading: `About ${tool.title} — Free Online Tool`,
+              paragraphs: [
+                tool.technicalDescription,
+                `ToolNami's ${tool.title} is designed to be 100% private, ultra-fast, and completely free. Unlike legacy web tools that require you to upload confidential data to remote cloud servers, our architecture runs directly within your modern web browser using client-side WebAssembly, JavaScript, and HTML5 APIs.`,
+                `Whether you are a developer, designer, student, accountant, or business professional, this tool streamlines your daily workflow with zero software installations, zero credit card requirements, and zero usage limits.`,
+              ],
+            }
+      }
     >
       <InteractiveToolWorkspace tool={tool} />
     </ToolShell>
@@ -374,6 +403,12 @@ function InteractiveToolWorkspace({ tool }: { tool: CompleteTool }) {
       return <MetaTagGeneratorTool />;
     case "ai-image-generator":
       return <AiImageGeneratorTool />;
+    case "autocastify-youtube-automation":
+    case "autocastify":
+    case "youtube-automation":
+    case "drive-to-youtube":
+    case "youtube-auto-uploader":
+      return <AutoCastifyTool />;
     case "ai-content-writer":
     case "ai-blog-generator":
     case "ai-title-generator":

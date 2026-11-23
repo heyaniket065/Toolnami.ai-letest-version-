@@ -253,6 +253,69 @@ gtag('config', 'G-0G6TS8RDZX');`,
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // Inject Monetag & Adsterra ad scripts cleanly into <head> after React hydration completes.
+  // Doing this post-hydration prevents React 19 from deduplicating same-src tags
+  // and prevents third-party DOM mutations from triggering SSR hydration errors.
+  useEffect(() => {
+    if (typeof document === "undefined" || !document.head) return;
+
+    const adScripts: Array<{
+      id: string;
+      src: string;
+      zone?: string;
+      cfAsync?: boolean;
+    }> = [
+      {
+        id: "monetag-302697",
+        src: "https://quge5.com/88/tag.min.js",
+        zone: "302697",
+        cfAsync: true,
+      },
+      {
+        id: "monetag-12135298",
+        src: "https://nap5k.com/tag.min.js",
+        zone: "12135298",
+        cfAsync: false,
+      },
+      {
+        id: "monetag-302710",
+        src: "https://quge5.com/88/tag.min.js",
+        zone: "302710",
+        cfAsync: true,
+      },
+      {
+        id: "adsterra-1",
+        src: "https://afders.org/1/811997a2355635c0cfbd69d2520e0378",
+        cfAsync: true,
+      },
+      {
+        id: "adsterra-14",
+        src: "https://bicea.org/14/5d57bbb8b2677d31093ab9c469ab0f9b",
+        cfAsync: true,
+      },
+    ];
+
+    for (const tag of adScripts) {
+      if (document.head.querySelector(`script[data-ad-id="${tag.id}"]`)) {
+        continue;
+      }
+      const script = document.createElement("script");
+      script.src = tag.src;
+      script.dataset.adId = tag.id;
+      if (tag.zone) {
+        script.dataset.zone = tag.zone;
+      }
+      script.async = true;
+      if (tag.cfAsync) {
+        script.setAttribute("data-cfasync", "false");
+      }
+      script.onerror = () => {
+        // Silently ignore network/ad-blocker blocks so the app console stays clean
+      };
+      document.head.appendChild(script);
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

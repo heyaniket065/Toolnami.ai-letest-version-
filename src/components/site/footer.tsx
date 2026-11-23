@@ -144,11 +144,6 @@ export function Footer() {
                 Contact &amp; Support
               </Link>
             </li>
-            <li>
-              <a href="/sitemap.xml" className="transition-colors hover:text-primary">
-                XML Sitemap
-              </a>
-            </li>
           </ul>
         </div>
 
@@ -164,11 +159,6 @@ export function Footer() {
               <Link to="/terms" className="transition-colors hover:text-primary">
                 Terms &amp; Disclaimer
               </Link>
-            </li>
-            <li>
-              <a href="/ads.txt" className="transition-colors hover:text-primary">
-                Authorized Sellers (ads.txt)
-              </a>
             </li>
             <li>
               <a

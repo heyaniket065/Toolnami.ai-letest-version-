@@ -115,7 +115,10 @@ export const categoriesQuery = {
 export const featuredToolsQuery = {
   queryKey: ["tools", "featured"],
   queryFn: async (): Promise<Tool[]> => {
-    return ALL_CATALOGUE_TOOLS.filter((t) => t.featured).slice(0, 6);
+    const featured = ALL_CATALOGUE_TOOLS.filter((t) => t.featured);
+    const hotTool = featured.find((t) => t.slug === "autocastify-youtube-automation");
+    if (!hotTool) return featured.slice(0, 6);
+    return [hotTool, ...featured.filter((t) => t.slug !== hotTool.slug)].slice(0, 6);
   },
   staleTime: 60 * 1000,
 };

@@ -95,12 +95,12 @@ const TRUST = [
 ];
 
 const QUICK_LAUNCH_PILLS = [
+  { label: "🔥 AutoCastify (YouTube AI)", slug: "autocastify-youtube-automation" },
   { label: "PDF Unlock", slug: "pdf-unlock" },
   { label: "Word to PDF", slug: "word-to-pdf" },
   { label: "Image Upscaler", slug: "image-upscaler" },
   { label: "Pomodoro Timer", slug: "pomodoro-timer" },
   { label: "JWT Decoder", slug: "jwt-decoder" },
-  { label: "Salary Calculator", slug: "salary-calculator" },
 ];
 
 function Home() {

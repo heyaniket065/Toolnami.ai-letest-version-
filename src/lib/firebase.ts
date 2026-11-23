@@ -44,7 +44,9 @@ async function testConnection() {
   }
 }
 
-// Validate connection on boot
-void testConnection();
+// Validate connection on client boot only (avoid SSR noise)
+if (typeof window !== "undefined") {
+  void testConnection();
+}
 
 export { app };

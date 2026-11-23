@@ -3577,6 +3577,61 @@ export const COMPLETE_TOOLS: CompleteTool[] = [
     seoDescription:
       "Write polished business emails, cold outreach, follow-ups, and job cover letters online free with ToolNami AI.",
   },
+  {
+    id: 101,
+    slug: "autocastify-youtube-automation",
+    to: "/tools/autocastify-youtube-automation",
+    title: "AutoCastify — YouTube AI & Auto-Uploader",
+    category: "ai",
+    categoryLabel: "AI Tools",
+    summary:
+      "Automate YouTube titles, descriptions, SEO tags, and auto-post videos straight from Google Drive folders.",
+    technicalDescription:
+      "AutoCastify (autocastify.ai.studio) is a dedicated YouTube creator automation suite that connects directly with your Google Drive folders to automatically publish and schedule videos to YouTube while generating high-CTR titles, keyword-rich descriptions, hashtags, and SEO metadata using AI.",
+    howToSteps: [
+      "Click Open AutoCastify to launch https://autocastify.ai.studio in a new tab.",
+      "Connect your Google Drive video folder and authorize your YouTube channel.",
+      "Let AutoCastify's AI generate click-worthy titles, SEO descriptions, and ranking tags automatically.",
+      "Enable hands-free auto-posting so new videos in your Drive folder publish straight to YouTube.",
+    ],
+    faqs: [
+      {
+        q: "What does AutoCastify do for YouTube creators?",
+        a: "AutoCastify streamlines end-to-end YouTube publishing: it uses AI to write optimized titles, descriptions, and SEO tags, and automatically uploads videos from a Google Drive folder directly to your YouTube channel.",
+      },
+      {
+        q: "Can AutoCastify automatically upload videos from a Google Drive folder to YouTube?",
+        a: "Yes. Once you connect your Google Drive folder in AutoCastify, videos placed in that folder can be automatically queued, optimized with AI metadata, and posted directly to YouTube without manual downloads or uploads.",
+      },
+      {
+        q: "Does AutoCastify help with YouTube SEO, titles, and descriptions?",
+        a: "Yes. AutoCastify generates search-optimized YouTube titles, structured video descriptions, tags, and hashtags designed to boost click-through rate (CTR) and organic discovery.",
+      },
+      {
+        q: "Where can I access AutoCastify?",
+        a: "You can launch AutoCastify directly at https://autocastify.ai.studio using the Open AutoCastify button on this page.",
+      },
+    ],
+    badge: { label: "Hot • Trending", icon: "🔥", tone: "hot" },
+    image: "/assets/tools/3d-autocastify.jpg",
+    baseUses: 38450,
+    isFeatured: true,
+    keywords: [
+      "autocastify",
+      "autocastify ai studio",
+      "youtube automation tool",
+      "youtube auto uploader",
+      "google drive to youtube auto post",
+      "youtube title generator ai",
+      "youtube description generator",
+      "youtube seo optimizer",
+      "youtube shorts auto uploader",
+    ],
+    seoTitle:
+      "AutoCastify — Free AI YouTube Automation, Drive Auto-Uploader & SEO Studio | ToolNami",
+    seoDescription:
+      "Automate your entire YouTube channel with AutoCastify: auto-publish videos directly from Google Drive folders and generate viral AI titles, descriptions, tags, and SEO metadata.",
+  },
 ];
 
 // Enrich keywords for every tool and build quick lookup map
@@ -3616,6 +3671,10 @@ export const SLUG_ALIASES: Record<string, string> = {
   "photo-size-reducer": "image-size-reducer",
   "reduce-image-size": "image-size-reducer",
   "image-size-reducer": "image-size-reducer",
+  autocastify: "autocastify-youtube-automation",
+  "youtube-automation": "autocastify-youtube-automation",
+  "drive-to-youtube": "autocastify-youtube-automation",
+  "youtube-auto-uploader": "autocastify-youtube-automation",
 };
 
 // Also register aliases directly into lookup map

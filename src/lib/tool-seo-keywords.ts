@@ -17,6 +17,8 @@ export const SITE_GLOBAL_KEYWORDS = [
   "developer utilities",
   "seo tools online free",
   "browser tools no signup",
+  "autocastify youtube automation",
+  "google drive to youtube auto uploader",
 ];
 
 export const EXTRA_TOOL_KEYWORDS: Record<string, string[]> = {
@@ -647,6 +649,20 @@ export const EXTRA_TOOL_KEYWORDS: Record<string, string[]> = {
     "ai email and cover letter writer",
     "draft professional business cold emails",
     "job application cover letter generator",
+  ],
+  "autocastify-youtube-automation": [
+    "autocastify",
+    "autocastify ai studio",
+    "youtube automation tool free",
+    "auto upload videos from google drive to youtube",
+    "google drive folder to youtube auto poster",
+    "youtube ai title and description generator",
+    "youtube seo tags metadata optimizer",
+    "automated youtube publishing software",
+    "youtube shorts auto uploader from drive",
+    "bulk youtube video uploader scheduler",
+    "youtube creator automation studio",
+    "ai youtube workflow automation",
   ],
 };
 

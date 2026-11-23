@@ -5,9 +5,15 @@ const jpgToPdfImg = "/assets/tools/3d-jpg-to-pdf.png";
 const pdfCompressorImg = "/assets/tools/3d-pdf-compressor.png";
 const pdfMergeImg = "/assets/tools/3d-pdf-merge.png";
 const qrCodeImg = "/assets/tools/3d-qr-code-generator.png";
+const autoCastifyImg = "/assets/tools/3d-autocastify.jpg";
 
 export type LiveToolSlug =
-  "pdf-compressor" | "pdf-merge" | "image-compressor" | "jpg-to-pdf" | "qr-code-generator";
+  | "pdf-compressor"
+  | "pdf-merge"
+  | "image-compressor"
+  | "jpg-to-pdf"
+  | "qr-code-generator"
+  | "autocastify-youtube-automation";
 
 export type ToolBadge = {
   label: string;
@@ -27,7 +33,8 @@ export type LiveTool = {
     | "/tools/pdf-merge"
     | "/tools/image-compressor"
     | "/tools/jpg-to-pdf"
-    | "/tools/qr-code-generator";
+    | "/tools/qr-code-generator"
+    | "/tools/autocastify-youtube-automation";
   title: string;
   description: string;
   image: string;
@@ -59,6 +66,48 @@ export function getDynamicUses(baseUses: number, seedOffset = 0): string {
 }
 
 export const LIVE_TOOLS: LiveTool[] = [
+  {
+    slug: "autocastify-youtube-automation",
+    to: "/tools/autocastify-youtube-automation",
+    title: "AutoCastify — YouTube AI & Auto-Uploader",
+    description:
+      "Auto-post videos from Google Drive to YouTube and generate AI titles, descriptions, and SEO tags automatically.",
+    image: autoCastifyImg,
+    categoryLabel: "AI Tools",
+    keywords: [
+      "autocastify",
+      "youtube automation",
+      "google drive to youtube auto uploader",
+      "youtube ai title description generator",
+      "youtube seo studio",
+    ],
+    badge: { label: "Hot • Trending", icon: "🔥", tone: "hot" },
+    baseUses: 38450,
+    relatedSlugs: ["pdf-compressor", "image-compressor", "qr-code-generator"],
+    howToSteps: [
+      "Open AutoCastify Studio via https://autocastify.ai.studio.",
+      "Connect your Google Drive folder and link your YouTube channel.",
+      "Generate AI-powered YouTube titles, descriptions, tags, and SEO metadata.",
+      "Automate hands-free video publishing straight from Drive to YouTube.",
+    ],
+    faqs: [
+      {
+        q: "How does AutoCastify automate YouTube uploads?",
+        a: "AutoCastify watches your connected Google Drive folder, generates optimized titles, descriptions, and tags with AI, and automatically publishes videos straight to your YouTube channel.",
+      },
+      {
+        q: "Does AutoCastify support YouTube SEO optimization?",
+        a: "Yes. It crafts high-CTR titles, keyword-rich descriptions, tags, and hashtags tailored for YouTube Search and Suggested discovery.",
+      },
+    ],
+    seoArticle: {
+      heading: "Automate Your YouTube Channel Workflow with AutoCastify",
+      paragraphs: [
+        "AutoCastify is built for YouTube creators, Shorts channels, and digital teams who want to scale consistent publishing without spending hours manually writing descriptions, researching tags, and uploading files.",
+        "By connecting Google Drive directly to YouTube and combining smart AI metadata generation with automated folder-to-channel posting, AutoCastify turns a repetitive multi-hour routine into a clean, automated creator pipeline.",
+      ],
+    },
+  },
   {
     slug: "pdf-compressor",
     to: "/tools/pdf-compressor",

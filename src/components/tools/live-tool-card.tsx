@@ -73,12 +73,16 @@ export function LiveToolCard({ tool }: { tool: LiveTool }) {
             <TrendingUp className="size-3.5 text-primary" />
             <span suppressHydrationWarning>{dynamicUses}</span>
           </span>
-          <span className="text-[11px] font-medium text-muted-foreground/80">Runs in Browser</span>
+          <span className="text-[11px] font-medium text-muted-foreground/80">
+            {tool.slug === "autocastify-youtube-automation"
+              ? "YouTube Automation"
+              : "Runs in Browser"}
+          </span>
         </div>
 
         {/* Redesigned Glassmorphic Open Tool Button */}
         <Link
-          to={tool.to}
+          to={tool.to as "/tools/$slug"}
           className="group/btn relative inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary/90 px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_2px_10px_rgba(2,132,199,0.25)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(2,132,199,0.4)] hover:brightness-110 active:translate-y-0 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
           <span>Open Tool</span>

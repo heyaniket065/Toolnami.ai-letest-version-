@@ -82,7 +82,11 @@ export function ToolCard({ tool, category }: { tool: Tool; category?: ToolCatego
             referrerPolicy="no-referrer"
             loading="lazy"
           />
-          {tool.featured ? (
+          {tool.slug === "autocastify-youtube-automation" ? (
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-rose-500 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
+              🔥 Hot • Trending
+            </span>
+          ) : tool.featured ? (
             <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-[11px] font-semibold text-accent-foreground shadow-sm">
               <Sparkles className="size-3" /> Featured
             </span>
